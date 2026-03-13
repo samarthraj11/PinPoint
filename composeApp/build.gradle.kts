@@ -25,6 +25,10 @@ kotlin {
                 implementation("com.google.maps.android:maps-compose:4.3.3")
                 implementation("com.google.android.gms:play-services-maps:18.2.0")
                 implementation("com.google.android.gms:play-services-location:21.2.0")
+                // MVI orbit
+                implementation("org.orbit-mvi:orbit-core:10.0.0")
+                implementation("org.orbit-mvi:orbit-viewmodel:10.0.0")
+                implementation("org.orbit-mvi:orbit-compose:10.0.0")
 
             }
         }
