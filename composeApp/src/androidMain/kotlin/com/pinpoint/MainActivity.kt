@@ -33,7 +33,7 @@ class MainActivity : ComponentActivity() {
     private fun showMap() {
         setContent {
             MaterialTheme {
-                MapScreen()
+                MainScreen()
             }
         }
     }
