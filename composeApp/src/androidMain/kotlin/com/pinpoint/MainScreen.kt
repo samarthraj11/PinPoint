@@ -1,17 +1,11 @@
 package com.pinpoint
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.automirrored.outlined.List
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.outlined.LocationOn
-import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -22,8 +16,8 @@ import androidx.navigation.compose.rememberNavController
 data class BottomNavItem(
     val label: String,
     val route: String,
-    val selectedIcon: ImageVector,
-    val unselectedIcon: ImageVector
+    val selectedIcon: Int,
+    val unselectedIcon: Int
 )
 
 @Composable
@@ -34,20 +28,20 @@ fun MainScreen() {
         BottomNavItem(
             label = "Location",
             route = "location",
-            selectedIcon = Icons.Filled.LocationOn,
-            unselectedIcon = Icons.Outlined.LocationOn
+            selectedIcon = R.drawable.ballooon,
+            unselectedIcon = R.drawable.ballooon,
         ),
         BottomNavItem(
             label = "Profile",
             route = "profile",
-            selectedIcon = Icons.Filled.Person,
-            unselectedIcon = Icons.Outlined.Person
+            selectedIcon = R.drawable.ballooon,
+            unselectedIcon = R.drawable.ballooon,
         ),
         BottomNavItem(
             label = "Groups",
             route = "groups",
-            selectedIcon = Icons.AutoMirrored.Filled.List,
-            unselectedIcon = Icons.AutoMirrored.Outlined.List
+            selectedIcon = R.drawable.ballooon,
+            unselectedIcon = R.drawable.ballooon,
         )
     )
 
@@ -75,7 +69,7 @@ fun MainScreen() {
                         },
                         icon = {
                             Icon(
-                                imageVector = if (selected) item.selectedIcon else item.unselectedIcon,
+                                painter = painterResource( R.drawable.ballooon),
                                 contentDescription = item.label
                             )
                         },
