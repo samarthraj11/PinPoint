@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
+import android.os.Looper
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -31,14 +32,24 @@ class LocationHelper(private val context: Context) {
     fun startLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(
                 context, Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(
+                context, Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) return
+
+        // Fetch last known location immediately as a fallback
+        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+            location?.let {
+                _currentLocation.value = it
+            }
+        }
 
         val locationRequest = LocationRequest.Builder(
             Priority.PRIORITY_HIGH_ACCURACY, 5000L // every 5 seconds
         ).setMinUpdateIntervalMillis(2000L).build()
 
-        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null)
+        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
     }
 
     fun stopLocationUpdates() {
