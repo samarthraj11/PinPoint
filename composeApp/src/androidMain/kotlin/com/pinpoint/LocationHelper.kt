@@ -41,6 +41,7 @@ class LocationHelper(private val context: Context) {
         // Fetch last known location immediately as a fallback
         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
             location?.let {
+                println("karl helper: $it")
                 _currentLocation.value = it
             }
         }
@@ -49,7 +50,11 @@ class LocationHelper(private val context: Context) {
             Priority.PRIORITY_HIGH_ACCURACY, 5000L // every 5 seconds
         ).setMinUpdateIntervalMillis(2000L).build()
 
-        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
+        fusedLocationClient.requestLocationUpdates(
+            locationRequest,
+            locationCallback,
+            Looper.getMainLooper()
+        )
     }
 
     fun stopLocationUpdates() {

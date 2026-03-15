@@ -1,7 +1,10 @@
 package com.pinpoint
 
+import android.Manifest
 import android.app.Application
+import android.content.pm.PackageManager
 import android.location.Location
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
@@ -29,16 +32,30 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
     val distance: StateFlow<String> = _distance
 
     init {
-        locationHelper.startLocationUpdates()
+        val context = application.applicationContext
+        val hasPermission = ContextCompat.checkSelfPermission(
+            context, Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        if (hasPermission) {
+            locationHelper.startLocationUpdates()
+        }
 
         viewModelScope.launch {
             locationHelper.currentLocation.collectLatest { location ->
+                println("karl : $location")
                 location?.let {
                     val latLng = LatLng(it.latitude, it.longitude)
                     _myLocation.value = latLng
                     calculateDistance(latLng, _otherLocation.value)
                 }
             }
+        }
+    }
+
+    fun onPermissionResult(granted: Boolean) {
+        if (granted) {
+            locationHelper.startLocationUpdates()
         }
     }
 
@@ -56,12 +73,6 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
         } else {
             String.format("%.0f meters", distanceInMeters)
         }
-    }
-
-    // Call this to update other person's location (e.g., from Firebase)
-    fun updateOtherLocation(latLng: LatLng) {
-        _otherLocation.value = latLng
-        _myLocation.value?.let { calculateDistance(it, latLng) }
     }
 
     override fun onCleared() {
