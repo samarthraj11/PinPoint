@@ -29,7 +29,8 @@ kotlin {
                 implementation("org.orbit-mvi:orbit-core:10.0.0")
                 implementation("org.orbit-mvi:orbit-viewmodel:10.0.0")
                 implementation("org.orbit-mvi:orbit-compose:10.0.0")
-
+                // Navigation Compose
+                implementation("androidx.navigation:navigation-compose:2.8.9")
             }
         }
         commonMain.dependencies {
