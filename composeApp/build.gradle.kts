@@ -31,6 +31,12 @@ kotlin {
                 implementation("org.orbit-mvi:orbit-compose:10.0.0")
                 // Navigation Compose
                 implementation("androidx.navigation:navigation-compose:2.8.9")
+                implementation("com.google.firebase:firebase-auth")
+
+                // Android Credential Manager (The modern way to do Google Sign-In)
+                implementation("androidx.credentials:credentials:1.2.1")
+                implementation("androidx.credentials:credentials-play-services-auth:1.2.1")
+                implementation("com.google.android.libraries.identity.googleid:googleid:1.1.0")
             }
         }
         commonMain.dependencies {
