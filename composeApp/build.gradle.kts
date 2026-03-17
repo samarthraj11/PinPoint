@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.ksp)
 }
 
 kotlin {
@@ -37,6 +38,8 @@ kotlin {
                 implementation("androidx.credentials:credentials:1.2.1")
                 implementation("androidx.credentials:credentials-play-services-auth:1.2.1")
                 implementation("com.google.android.libraries.identity.googleid:googleid:1.1.0")
+//                implementation("com.google.dagger:hilt-android:2.57.1")
+//                ksp("com.google.dagger:hilt-android-compiler:2.57.1")
             }
         }
         commonMain.dependencies {
