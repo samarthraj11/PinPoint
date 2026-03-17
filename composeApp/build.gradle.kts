@@ -21,26 +21,23 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.activity.compose)
-            dependencies {
-                // Google Maps Compose
-                implementation("com.google.maps.android:maps-compose:4.3.3")
-                implementation("com.google.android.gms:play-services-maps:18.2.0")
-                implementation("com.google.android.gms:play-services-location:21.2.0")
-                // MVI orbit
-                implementation("org.orbit-mvi:orbit-core:10.0.0")
-                implementation("org.orbit-mvi:orbit-viewmodel:10.0.0")
-                implementation("org.orbit-mvi:orbit-compose:10.0.0")
-                // Navigation Compose
-                implementation("androidx.navigation:navigation-compose:2.8.9")
-                implementation("com.google.firebase:firebase-auth")
+            // Google Maps Compose
+            implementation("com.google.maps.android:maps-compose:4.3.3")
+            implementation("com.google.android.gms:play-services-maps:18.2.0")
+            implementation("com.google.android.gms:play-services-location:21.2.0")
+            // MVI orbit
+            implementation("org.orbit-mvi:orbit-core:10.0.0")
+            implementation("org.orbit-mvi:orbit-viewmodel:10.0.0")
+            implementation("org.orbit-mvi:orbit-compose:10.0.0")
+            // Navigation Compose
+            implementation("androidx.navigation:navigation-compose:2.8.9")
+            implementation("com.google.firebase:firebase-auth")
 
-                // Android Credential Manager (The modern way to do Google Sign-In)
-                implementation("androidx.credentials:credentials:1.2.1")
-                implementation("androidx.credentials:credentials-play-services-auth:1.2.1")
-                implementation("com.google.android.libraries.identity.googleid:googleid:1.1.0")
-                implementation("com.google.dagger:hilt-android:2.57.1")
-                ksp("com.google.dagger:hilt-android-compiler:2.57.1")
-            }
+            // Android Credential Manager (The modern way to do Google Sign-In)
+            implementation("androidx.credentials:credentials:1.2.1")
+            implementation("androidx.credentials:credentials-play-services-auth:1.2.1")
+            implementation("com.google.android.libraries.identity.googleid:googleid:1.1.0")
+            implementation("com.google.dagger:hilt-android:2.57.1")
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -93,5 +90,6 @@ android {
 
 dependencies {
     debugImplementation(libs.compose.uiTooling)
+    add("kspAndroid", "com.google.dagger:hilt-android-compiler:2.57.1")
 }
 
