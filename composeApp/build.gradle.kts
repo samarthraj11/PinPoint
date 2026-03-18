@@ -7,7 +7,8 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
-    alias(libs.plugins.ksp) apply false
+    alias(libs.plugins.ksp)
+    id("com.google.dagger.hilt.android")
 }
 
 kotlin {
@@ -91,6 +92,6 @@ android {
 
 dependencies {
     debugImplementation(libs.compose.uiTooling)
-    add("kspAndroid", "com.google.dagger:hilt-android-compiler:2.57.1")
+    add("kspAndroid", "com.google.dagger:hilt-compiler:2.57.1")
 }
 
