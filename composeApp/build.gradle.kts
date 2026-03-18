@@ -38,6 +38,7 @@ kotlin {
             implementation("androidx.credentials:credentials-play-services-auth:1.2.1")
             implementation("com.google.android.libraries.identity.googleid:googleid:1.1.0")
             implementation("com.google.dagger:hilt-android:2.57.1")
+            implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
