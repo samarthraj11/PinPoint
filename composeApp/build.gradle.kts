@@ -7,6 +7,8 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.ksp)
+    id("com.google.dagger.hilt.android")
 }
 
 kotlin {
@@ -20,18 +22,28 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.activity.compose)
-            dependencies {
-                // Google Maps Compose
-                implementation("com.google.maps.android:maps-compose:4.3.3")
-                implementation("com.google.android.gms:play-services-maps:18.2.0")
-                implementation("com.google.android.gms:play-services-location:21.2.0")
-                // MVI orbit
-                implementation("org.orbit-mvi:orbit-core:10.0.0")
-                implementation("org.orbit-mvi:orbit-viewmodel:10.0.0")
-                implementation("org.orbit-mvi:orbit-compose:10.0.0")
-                // Navigation Compose
-                implementation("androidx.navigation:navigation-compose:2.8.9")
-            }
+            // Google Maps Compose
+            implementation("com.google.maps.android:maps-compose:4.3.3")
+            implementation("com.google.android.gms:play-services-maps:18.2.0")
+            implementation("com.google.android.gms:play-services-location:21.2.0")
+            // MVI orbit
+            implementation("org.orbit-mvi:orbit-core:10.0.0")
+            implementation("org.orbit-mvi:orbit-viewmodel:10.0.0")
+            implementation("org.orbit-mvi:orbit-compose:10.0.0")
+            // Navigation Compose (used for bottom tabs in MainScreen)
+            implementation("androidx.navigation:navigation-compose:2.8.9")
+            // Navigation 3
+            implementation("androidx.navigation3:navigation3-runtime:1.0.0-alpha02")
+            implementation("androidx.navigation3:navigation3-ui:1.0.0-alpha02")
+            implementation("com.google.firebase:firebase-auth:23.1.0")
+            implementation("com.google.firebase:firebase-database:21.0.0")
+
+            // Android Credential Manager (The modern way to do Google Sign-In)
+            implementation("androidx.credentials:credentials:1.2.1")
+            implementation("androidx.credentials:credentials-play-services-auth:1.2.1")
+            implementation("com.google.android.libraries.identity.googleid:googleid:1.1.0")
+            implementation("com.google.dagger:hilt-android:2.57.1")
+            implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -84,5 +96,6 @@ android {
 
 dependencies {
     debugImplementation(libs.compose.uiTooling)
+    add("kspAndroid", "com.google.dagger:hilt-compiler:2.57.1")
 }
 
