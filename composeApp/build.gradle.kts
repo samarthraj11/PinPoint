@@ -36,6 +36,7 @@ kotlin {
             implementation("androidx.navigation3:navigation3-runtime:1.0.0-alpha02")
             implementation("androidx.navigation3:navigation3-ui:1.0.0-alpha02")
             implementation("com.google.firebase:firebase-auth:23.1.0")
+            implementation("com.google.firebase:firebase-database:21.0.0")
 
             // Android Credential Manager (The modern way to do Google Sign-In)
             implementation("androidx.credentials:credentials:1.2.1")
