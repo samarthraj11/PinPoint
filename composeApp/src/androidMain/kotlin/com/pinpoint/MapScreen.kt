@@ -18,10 +18,13 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.compose.*
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootGraph
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 import com.pinpoint.map.MapScreenSideEffect
 
+@Destination<RootGraph>
 @Composable
 fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
 
