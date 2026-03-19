@@ -30,8 +30,11 @@ kotlin {
             implementation("org.orbit-mvi:orbit-core:10.0.0")
             implementation("org.orbit-mvi:orbit-viewmodel:10.0.0")
             implementation("org.orbit-mvi:orbit-compose:10.0.0")
-            // Navigation Compose
+            // Navigation Compose (used for bottom tabs in MainScreen)
             implementation("androidx.navigation:navigation-compose:2.8.9")
+            // Navigation 3
+            implementation("androidx.navigation3:navigation3-runtime:1.0.0-alpha02")
+            implementation("androidx.navigation3:navigation3-ui:1.0.0-alpha02")
             implementation("com.google.firebase:firebase-auth:23.1.0")
 
             // Android Credential Manager (The modern way to do Google Sign-In)
