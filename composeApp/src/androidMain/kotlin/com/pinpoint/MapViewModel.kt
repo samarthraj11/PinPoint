@@ -89,26 +89,24 @@ class MapViewModel @Inject constructor(
             reduce { state.copy(distance = "No other members nearby") }
             return@intent
         }
-        val nearest = otherMembers.minByOrNull { member ->
+        var minDistance = Float.MAX_VALUE
+        var nearestName = ""
+        otherMembers.forEach { member ->
             val results = FloatArray(1)
             Location.distanceBetween(
                 myLocation.latitude, myLocation.longitude,
                 member.latitude, member.longitude,
                 results
             )
-            results[0]
-        } ?: return@intent
-        val results = FloatArray(1)
-        Location.distanceBetween(
-            myLocation.latitude, myLocation.longitude,
-            nearest.latitude, nearest.longitude,
-            results
-        )
-        val distanceInMeters = results[0]
-        val distanceText = if (distanceInMeters >= 1000) {
-            String.format("%.2f km to %s", distanceInMeters / 1000, nearest.displayName)
+            if (results[0] < minDistance) {
+                minDistance = results[0]
+                nearestName = member.displayName
+            }
+        }
+        val distanceText = if (minDistance >= 1000) {
+            String.format("%.2f km to %s", minDistance / 1000, nearestName)
         } else {
-            String.format("%.0f m to %s", distanceInMeters, nearest.displayName)
+            String.format("%.0f m to %s", minDistance, nearestName)
         }
         reduce { state.copy(distance = distanceText) }
     }

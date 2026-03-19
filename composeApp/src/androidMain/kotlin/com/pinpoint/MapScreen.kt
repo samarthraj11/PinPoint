@@ -160,7 +160,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "\uD83D\uDCCD Distance",
+                    text = "📍 Distance",
                     fontSize = 14.sp,
                     color = Color.Gray
                 )
