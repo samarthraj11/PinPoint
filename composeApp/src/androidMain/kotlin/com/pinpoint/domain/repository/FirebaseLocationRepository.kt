@@ -15,26 +15,41 @@ import javax.inject.Singleton
 @Singleton
 class FirebaseLocationRepository @Inject constructor() {
 
-    private val database = FirebaseDatabase.getInstance()
-    private val activeTripRef = database.getReference("trips/active/members")
+    companion object {
+        const val DEFAULT_GROUP_ID = "2748"
+    }
 
-    fun updateMyLocation(uid: String, displayName: String, lat: Double, lng: Double) {
-        val data = mapOf(
+    private val database = FirebaseDatabase.getInstance()
+
+    private fun groupMembersRef(groupId: String = DEFAULT_GROUP_ID) =
+        database.getReference("groups/$groupId/members")
+
+    fun joinGroup(uid: String, displayName: String, groupId: String = DEFAULT_GROUP_ID) {
+        val data = mapOf<String, Any>(
+            "displayName" to displayName,
+            "joinedAt" to ServerValue.TIMESTAMP
+        )
+        groupMembersRef(groupId).child(uid).updateChildren(data)
+    }
+
+    fun updateMyLocation(uid: String, displayName: String, lat: Double, lng: Double, groupId: String = DEFAULT_GROUP_ID) {
+        val data = mapOf<String, Any>(
             "displayName" to displayName,
             "latitude" to lat,
             "longitude" to lng,
             "timestamp" to ServerValue.TIMESTAMP
         )
-        activeTripRef.child(uid).setValue(data)
+        groupMembersRef(groupId).child(uid).updateChildren(data)
     }
 
-    fun observeMembers(): Flow<List<MemberLocation>> = callbackFlow {
-        val listener = activeTripRef.addValueEventListener(object : ValueEventListener {
+    fun observeMembers(groupId: String = DEFAULT_GROUP_ID): Flow<List<MemberLocation>> = callbackFlow {
+        val ref = groupMembersRef(groupId)
+        val listener = ref.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val members = snapshot.children.mapNotNull { child ->
                     val displayName = child.child("displayName").getValue(String::class.java) ?: ""
-                    val latitude = child.child("latitude").getValue(Double::class.java) ?: 0.0
-                    val longitude = child.child("longitude").getValue(Double::class.java) ?: 0.0
+                    val latitude = child.child("latitude").getValue(Double::class.java) ?: return@mapNotNull null
+                    val longitude = child.child("longitude").getValue(Double::class.java) ?: return@mapNotNull null
                     val timestamp = child.child("timestamp").getValue(Long::class.java) ?: 0L
                     MemberLocation(
                         uid = child.key ?: "",
@@ -51,10 +66,10 @@ class FirebaseLocationRepository @Inject constructor() {
                 close(error.toException())
             }
         })
-        awaitClose { activeTripRef.removeEventListener(listener) }
+        awaitClose { ref.removeEventListener(listener) }
     }
 
-    fun removeMyLocation(uid: String) {
-        activeTripRef.child(uid).removeValue()
+    fun removeMyLocation(uid: String, groupId: String = DEFAULT_GROUP_ID) {
+        groupMembersRef(groupId).child(uid).removeValue()
     }
 }
