@@ -1,7 +1,7 @@
-package com.pinpoint.map
+package com.pinpoint.feature.map
 
 import com.google.android.gms.maps.model.LatLng
-import com.pinpoint.data.model.MemberLocation
+import com.pinpoint.domain.model.MemberLocation
 
 data class MapScreenState(
     val myLocation: LatLng? = null,

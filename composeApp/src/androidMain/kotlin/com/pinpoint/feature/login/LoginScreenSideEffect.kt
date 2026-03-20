@@ -1,4 +1,4 @@
-package com.pinpoint.login
+package com.pinpoint.feature.login
 
 sealed interface LoginScreenSideEffect {
     data object SignInWithGoogle: LoginScreenSideEffect

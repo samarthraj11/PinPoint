@@ -5,7 +5,7 @@
 xcuserdata
 !src/**/build/
 local.properties
-google-services.json
+composeApp/google-services.json
 .idea
 .DS_Store
 captures

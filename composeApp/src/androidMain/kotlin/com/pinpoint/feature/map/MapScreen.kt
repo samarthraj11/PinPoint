@@ -1,5 +1,6 @@
-package com.pinpoint
+package com.pinpoint.feature.map
 
+import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
@@ -22,7 +23,6 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
-import com.pinpoint.map.MapScreenSideEffect
 
 @Destination<RootGraph>
 @Composable
@@ -41,14 +41,14 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
-        val granted = permissions[android.Manifest.permission.ACCESS_FINE_LOCATION] == true
+        val granted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true
         viewModel.onPermissionResult(granted)
     }
     LaunchedEffect(Unit) {
         permissionLauncher.launch(
             arrayOf(
-                android.Manifest.permission.ACCESS_FINE_LOCATION,
-                android.Manifest.permission.ACCESS_COARSE_LOCATION
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
             )
         )
     }

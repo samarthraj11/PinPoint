@@ -1,4 +1,4 @@
-package com.pinpoint
+package com.pinpoint.util
 
 import android.Manifest
 import android.content.Context

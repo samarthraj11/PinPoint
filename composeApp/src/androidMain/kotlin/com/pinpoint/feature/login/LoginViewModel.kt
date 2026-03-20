@@ -1,11 +1,10 @@
-package com.pinpoint.login
+package com.pinpoint.feature.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pinpoint.domain.model.UIGoogleUserInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
-import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost

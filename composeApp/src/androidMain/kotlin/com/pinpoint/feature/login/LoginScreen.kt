@@ -1,4 +1,4 @@
-package com.pinpoint.login
+package com.pinpoint.feature.login
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -17,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tutorlog.design.LocalColors
-import com.pinpoint.login.composable.LoginComposable
+import com.pinpoint.feature.login.composable.LoginComposable
 import com.pinpoint.util.GoogleSignInUtils
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph

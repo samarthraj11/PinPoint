@@ -1,4 +1,4 @@
-package com.pinpoint
+package com.pinpoint.feature.group
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*

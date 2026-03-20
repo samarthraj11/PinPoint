@@ -1,4 +1,4 @@
-package com.pinpoint
+package com.pinpoint.feature.map
 
 import android.Manifest
 import android.app.Application
@@ -9,9 +9,8 @@ import androidx.lifecycle.ViewModel
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
-import com.pinpoint.data.FirebaseLocationRepository
-import com.pinpoint.map.MapScreenSideEffect
-import com.pinpoint.map.MapScreenState
+import com.pinpoint.util.LocationHelper
+import com.pinpoint.domain.repository.FirebaseLocationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
 import org.orbitmvi.orbit.Container
