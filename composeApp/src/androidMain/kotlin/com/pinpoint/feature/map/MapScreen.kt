@@ -135,7 +135,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Active Trip",
+                    text = "Group ${state.groupId}",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
