@@ -62,11 +62,13 @@ fun WelcomeUserComposable(
                 Text(
                     text = "Welcome",
                     fontSize = 12.sp,
+                    lineHeight = 12.sp,
                     color = Color.White.copy(alpha = 0.8f)
                 )
                 Text(
                     text = displayName.ifEmpty { "User" },
                     fontSize = 16.sp,
+                    lineHeight = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
                 )
