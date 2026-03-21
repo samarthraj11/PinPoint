@@ -2,7 +2,10 @@ package com.pinpoint.feature.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import com.pinpoint.domain.model.UIGoogleUserInfo
+import com.pinpoint.domain.preferences.UserPreferences
 import com.pinpoint.domain.repository.FirebaseLocationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -15,11 +18,23 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val locationRepository: FirebaseLocationRepository
+    private val locationRepository: FirebaseLocationRepository,
+    private val userPreferences: UserPreferences
 ): ContainerHost<LoginScreenState, LoginScreenSideEffect>, ViewModel() {
 
-    override val container: Container<LoginScreenState, LoginScreenSideEffect> = container(initialState = LoginScreenState())
+    override val container: Container<LoginScreenState, LoginScreenSideEffect> = container(initialState = LoginScreenState()) {
+        checkSavedSession()
+    }
 
+    private fun checkSavedSession() = intent {
+        val savedUid = userPreferences.getUid()
+        val currentUser = Firebase.auth.currentUser
+        if (savedUid != null && currentUser != null) {
+            postSideEffect(LoginScreenSideEffect.NavigateToHomeScreen)
+        } else if (savedUid != null && currentUser == null) {
+            userPreferences.clear()
+        }
+    }
 
     fun onSignIn() {
         viewModelScope.launch {
@@ -36,7 +51,7 @@ class LoginViewModel @Inject constructor(
 
     fun saveLocalUser(userInfo: UIGoogleUserInfo) {
         viewModelScope.launch {
-
+            userPreferences.saveUid(userInfo.uid)
         }
     }
 

@@ -12,12 +12,34 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
+import com.ramcosta.composedestinations.generated.NavGraphs
+import com.ramcosta.composedestinations.generated.destinations.LoginScreenDestination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import org.orbitmvi.orbit.compose.collectSideEffect
 
 @Destination<RootGraph>
 @Composable
-fun ProfileScreen() {
+fun ProfileScreen(
+    navigator: DestinationsNavigator,
+    viewModel: ProfileViewModel = hiltViewModel()
+) {
+
+    viewModel.collectSideEffect { sideEffect ->
+        when (sideEffect) {
+            is ProfileScreenSideEffect.NavigateToLogin -> {
+                navigator.navigate(LoginScreenDestination) {
+                    popUpTo(NavGraphs.root) {
+                        inclusive = true
+                    }
+                    launchSingleTop = true
+                }
+            }
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -64,6 +86,27 @@ fun ProfileScreen() {
         ProfileInfoCard(label = "Location", value = "New Delhi, India")
         Spacer(modifier = Modifier.height(12.dp))
         ProfileInfoCard(label = "Status", value = "Available")
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        // Logout button
+        Button(
+            onClick = { viewModel.logout() },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp),
+            shape = RoundedCornerShape(12.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.error
+            )
+        ) {
+            Text(
+                text = "Logout",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.padding(vertical = 4.dp)
+            )
+        }
     }
 }
 
