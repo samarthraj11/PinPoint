@@ -32,7 +32,13 @@ class FirebaseLocationRepository @Inject constructor() {
         groupMembersRef(groupId).child(uid).updateChildren(data)
     }
 
-    fun updateMyLocation(uid: String, displayName: String, lat: Double, lng: Double, groupId: String = DEFAULT_GROUP_ID) {
+    fun updateMyLocation(
+        uid: String,
+        displayName: String,
+        lat: Double,
+        lng: Double,
+        groupId: String = DEFAULT_GROUP_ID
+    ) {
         val data = mapOf<String, Any>(
             "displayName" to displayName,
             "latitude" to lat,
@@ -42,32 +48,36 @@ class FirebaseLocationRepository @Inject constructor() {
         groupMembersRef(groupId).child(uid).updateChildren(data)
     }
 
-    fun observeMembers(groupId: String = DEFAULT_GROUP_ID): Flow<List<MemberLocation>> = callbackFlow {
-        val ref = groupMembersRef(groupId)
-        val listener = ref.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val members = snapshot.children.mapNotNull { child ->
-                    val displayName = child.child("displayName").getValue(String::class.java) ?: ""
-                    val latitude = child.child("latitude").getValue(Double::class.java) ?: return@mapNotNull null
-                    val longitude = child.child("longitude").getValue(Double::class.java) ?: return@mapNotNull null
-                    val timestamp = child.child("timestamp").getValue(Long::class.java) ?: 0L
-                    MemberLocation(
-                        uid = child.key ?: "",
-                        displayName = displayName,
-                        latitude = latitude,
-                        longitude = longitude,
-                        timestamp = timestamp
-                    )
+    fun observeMembers(groupId: String = DEFAULT_GROUP_ID): Flow<List<MemberLocation>> =
+        callbackFlow {
+            val ref = groupMembersRef(groupId)
+            val listener = ref.addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val members = snapshot.children.mapNotNull { child ->
+                        val displayName =
+                            child.child("displayName").getValue(String::class.java) ?: ""
+                        val latitude = child.child("latitude").getValue(Double::class.java)
+                            ?: return@mapNotNull null
+                        val longitude = child.child("longitude").getValue(Double::class.java)
+                            ?: return@mapNotNull null
+                        val timestamp = child.child("timestamp").getValue(Long::class.java) ?: 0L
+                        MemberLocation(
+                            uid = child.key ?: "",
+                            displayName = displayName,
+                            latitude = latitude,
+                            longitude = longitude,
+                            timestamp = timestamp
+                        )
+                    }
+                    trySend(members)
                 }
-                trySend(members)
-            }
 
-            override fun onCancelled(error: DatabaseError) {
-                close(error.toException())
-            }
-        })
-        awaitClose { ref.removeEventListener(listener) }
-    }
+                override fun onCancelled(error: DatabaseError) {
+                    close(error.toException())
+                }
+            })
+            awaitClose { ref.removeEventListener(listener) }
+        }
 
     fun removeMyLocation(uid: String, groupId: String = DEFAULT_GROUP_ID) {
         groupMembersRef(groupId).child(uid).removeValue()
