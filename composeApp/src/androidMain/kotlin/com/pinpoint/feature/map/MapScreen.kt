@@ -19,6 +19,7 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.compose.*
+import com.pinpoint.feature.map.composable.WelcomeUserComposable
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import org.orbitmvi.orbit.compose.collectAsState
@@ -117,34 +118,55 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                 }
         }
 
-        // Active Trip Info Card (Top)
-        Card(
+        // Top Section: Welcome + Group Info
+        Column(
             modifier = Modifier
                 .align(Alignment.TopCenter)
                 .padding(top = 48.dp, start = 16.dp, end = 16.dp)
-                .fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF1976D2)),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                .fillMaxWidth()
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+            // Welcome User Composable
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF2E7D32)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
-                Text(
-                    text = "Group ${state.groupId}",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
+                WelcomeUserComposable(
+                    displayName = state.currentUserDisplayName,
+                    photoUrl = state.currentUserPhotoUrl,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
                 )
-                Text(
-                    text = "${state.members.size} member${if (state.members.size != 1) "s" else ""}",
-                    fontSize = 14.sp,
-                    color = Color.White.copy(alpha = 0.8f)
-                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Active Trip Info Card
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF1976D2)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Group ${state.groupId}",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                    Text(
+                        text = "${state.members.size} member${if (state.members.size != 1) "s" else ""}",
+                        fontSize = 14.sp,
+                        color = Color.White.copy(alpha = 0.8f)
+                    )
+                }
             }
         }
 

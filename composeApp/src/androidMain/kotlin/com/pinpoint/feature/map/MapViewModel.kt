@@ -29,7 +29,13 @@ class MapViewModel @Inject constructor(
         container(initialState = MapScreenState()) {
             val user = Firebase.auth.currentUser
             if (user != null) {
-                reduce { state.copy(currentUserId = user.uid) }
+                reduce {
+                    state.copy(
+                        currentUserId = user.uid,
+                        currentUserDisplayName = user.displayName ?: "",
+                        currentUserPhotoUrl = user.photoUrl?.toString()
+                    )
+                }
             }
             startTrackingIfPermitted()
             observeGroupMembers()
