@@ -73,8 +73,6 @@ fun LoginScreen(
     Scaffold(
         modifier = Modifier
             .background(color = LocalColors.Gray900)
-            .windowInsetsPadding(WindowInsets.statusBars)
-            .windowInsetsPadding(WindowInsets.navigationBars)
             .fillMaxSize()
     ) { contentPadding ->
         LoginComposable(
