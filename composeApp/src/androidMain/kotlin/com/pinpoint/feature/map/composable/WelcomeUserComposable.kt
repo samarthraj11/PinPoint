@@ -31,7 +31,7 @@ fun WelcomeUserComposable(
     ) {
         AsyncImage(
             model = photoUrl,
-            contentDescription = "Profile picture",
+            contentDescription = "Profile picture of $displayName",
             modifier = Modifier
                 .size(40.dp)
                 .clip(CircleShape)
