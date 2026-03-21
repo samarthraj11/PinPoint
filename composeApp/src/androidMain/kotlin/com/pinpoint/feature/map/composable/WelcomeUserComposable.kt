@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -35,11 +36,14 @@ fun WelcomeUserComposable(
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth()
             .background(Color(0xFF2E7D32), shape = RoundedCornerShape(12.dp))
+
     ) {
+        Spacer(modifier = Modifier.height(36.dp))
         Row(
-            modifier = modifier,
+            modifier = Modifier
+                .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             AsyncImage(
@@ -68,32 +72,27 @@ fun WelcomeUserComposable(
                 )
             }
         }
+        Spacer(modifier = Modifier.height(8.dp))
 
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF1976D2)),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = Color(0xFF1976D2), shape = RoundedCornerShape(12.dp))
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Group ${groupId}",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-                Text(
-                    text = "$memberCount member${if (memberCount != 1) "s" else ""}",
-                    fontSize = 14.sp,
-                    color = Color.White.copy(alpha = 0.8f)
-                )
-            }
+            Text(
+                text = "Group ${groupId}",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
+            Text(
+                text = "$memberCount member${if (memberCount != 1) "s" else ""}",
+                fontSize = 14.sp,
+                color = Color.White.copy(alpha = 0.8f)
+            )
         }
     }
 }

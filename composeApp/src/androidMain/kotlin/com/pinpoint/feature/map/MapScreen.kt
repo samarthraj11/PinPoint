@@ -117,11 +117,11 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                     }
                 }
         }
+        println("karl : value ${WindowInsets.statusBars.asPaddingValues().calculateTopPadding()}")
 
         WelcomeUserComposable(
             displayName = state.currentUserDisplayName,
             photoUrl = state.currentUserPhotoUrl,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
             groupId = state.groupId,
             memberCount = state.members.size
         )
