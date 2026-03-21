@@ -1,8 +1,8 @@
 package com.pinpoint.di
 
 import android.content.Context
-import com.pinpoint.LocationHelper
-import com.pinpoint.data.FirebaseLocationRepository
+import com.pinpoint.util.LocationHelper
+import com.pinpoint.domain.repository.FirebaseLocationRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

@@ -1,4 +1,4 @@
-package com.pinpoint.login
+package com.pinpoint.feature.login
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -17,15 +17,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tutorlog.design.LocalColors
-import com.pinpoint.login.composable.LoginComposable
+import com.pinpoint.feature.login.composable.LoginComposable
 import com.pinpoint.util.GoogleSignInUtils
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootGraph
+import com.ramcosta.composedestinations.generated.destinations.LoginScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.MapScreenDestination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 
+@Destination<RootGraph>(start = true)
 @Composable
 fun LoginScreen(
-    modifier: Modifier = Modifier,
-    onNavigateToMain: () -> Unit = {},
+    navigator: DestinationsNavigator,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
 
@@ -54,16 +59,19 @@ fun LoginScreen(
                 )
             }
             is LoginScreenSideEffect.NavigateToHomeScreen -> {
-                onNavigateToMain()
+                navigator.navigate(MapScreenDestination) {
+                    popUpTo(LoginScreenDestination) {
+                        inclusive = true
+                    }
+                    launchSingleTop = true
+                }
             }
         }
     }
 
 
-
-
     Scaffold(
-        modifier = modifier
+        modifier = Modifier
             .background(color = LocalColors.Gray900)
             .windowInsetsPadding(WindowInsets.statusBars)
             .windowInsetsPadding(WindowInsets.navigationBars)

@@ -1,4 +1,4 @@
-package com.pinpoint.login.composable
+package com.pinpoint.feature.login.composable
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

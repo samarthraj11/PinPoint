@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.ksp)
     id("com.google.dagger.hilt.android")
+    id("com.google.gms.google-services")
 }
 
 kotlin {
@@ -30,11 +31,8 @@ kotlin {
             implementation("org.orbit-mvi:orbit-core:10.0.0")
             implementation("org.orbit-mvi:orbit-viewmodel:10.0.0")
             implementation("org.orbit-mvi:orbit-compose:10.0.0")
-            // Navigation Compose (used for bottom tabs in MainScreen)
-            implementation("androidx.navigation:navigation-compose:2.8.9")
-            // Navigation 3
-            implementation("androidx.navigation3:navigation3-runtime:1.0.0-alpha02")
-            implementation("androidx.navigation3:navigation3-ui:1.0.0-alpha02")
+            // Compose Destinations (type-safe navigation)
+            implementation(libs.compose.destinations.core)
             implementation("com.google.firebase:firebase-auth:23.1.0")
             implementation("com.google.firebase:firebase-database:21.0.0")
 
@@ -97,5 +95,6 @@ android {
 dependencies {
     debugImplementation(libs.compose.uiTooling)
     add("kspAndroid", "com.google.dagger:hilt-compiler:2.57.1")
+    add("kspAndroid", libs.compose.destinations.ksp)
 }
 

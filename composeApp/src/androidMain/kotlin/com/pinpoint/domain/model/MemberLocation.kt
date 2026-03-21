@@ -1,4 +1,4 @@
-package com.pinpoint.data.model
+package com.pinpoint.domain.model
 
 import com.google.android.gms.maps.model.LatLng
 

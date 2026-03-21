@@ -1,11 +1,11 @@
-package com.pinpoint.login
+package com.pinpoint.feature.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pinpoint.domain.model.UIGoogleUserInfo
+import com.pinpoint.domain.repository.FirebaseLocationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
-import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
@@ -15,14 +15,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
+    private val locationRepository: FirebaseLocationRepository
 ): ContainerHost<LoginScreenState, LoginScreenSideEffect>, ViewModel() {
 
     override val container: Container<LoginScreenState, LoginScreenSideEffect> = container(initialState = LoginScreenState())
-
-
-    init {
-
-    }
 
 
     fun onSignIn() {
@@ -63,6 +59,10 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             intent {
                 saveLocalUser(userInfo)
+                locationRepository.joinGroup(
+                    uid = userInfo.uid,
+                    displayName = userInfo.displayName
+                )
                 delay(500)
                 postSideEffect(LoginScreenSideEffect.NavigateToHomeScreen)
             }
