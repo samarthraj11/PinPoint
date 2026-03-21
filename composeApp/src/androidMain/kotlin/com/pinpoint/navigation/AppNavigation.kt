@@ -1,6 +1,7 @@
 package com.pinpoint.navigation
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -46,6 +47,7 @@ fun AppNavigation() {
     Scaffold(
         modifier = Modifier.fillMaxSize()
             .background(LocalColors.Gray900),
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         bottomBar = {
             if (shouldShowBottomBar) {
                 val navigator = navController.rememberDestinationsNavigator()
