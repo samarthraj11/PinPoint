@@ -24,7 +24,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 
-@Destination<RootGraph>(start = true)
+@Destination<RootGraph>
 @Composable
 fun LoginScreen(
     navigator: DestinationsNavigator,
