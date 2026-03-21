@@ -9,6 +9,8 @@ data class MapScreenState(
     val members: List<MemberLocation> = emptyList(),
     val isTracking: Boolean = false,
     val currentUserId: String = "",
+    val currentUserDisplayName: String = "",
+    val currentUserPhotoUrl: String? = null,
     val distance: String = "Calculating...",
     val groupId: String = FirebaseLocationRepository.DEFAULT_GROUP_ID
 )
