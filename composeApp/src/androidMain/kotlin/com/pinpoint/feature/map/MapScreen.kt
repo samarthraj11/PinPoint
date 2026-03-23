@@ -1,6 +1,7 @@
 package com.pinpoint.feature.map
 
 import android.Manifest
+import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
@@ -25,9 +26,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
@@ -60,7 +63,13 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
         }
     }
 
-    var showPermissionRationale by remember { mutableStateOf(true) }
+    val context = LocalContext.current
+    val hasLocationPermission = remember {
+        ContextCompat.checkSelfPermission(
+            context, Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+    var showPermissionRationale by remember { mutableStateOf(!hasLocationPermission) }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
@@ -71,7 +80,10 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
 
     if (showPermissionRationale) {
         AlertDialog(
-            onDismissRequest = { showPermissionRationale = false },
+            onDismissRequest = {
+                showPermissionRationale = false
+                viewModel.onPermissionResult(false)
+            },
             title = { Text("Location Permission Required") },
             text = {
                 Text(
@@ -94,7 +106,10 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showPermissionRationale = false }) {
+                TextButton(onClick = {
+                    showPermissionRationale = false
+                    viewModel.onPermissionResult(false)
+                }) {
                     Text("Deny")
                 }
             }
