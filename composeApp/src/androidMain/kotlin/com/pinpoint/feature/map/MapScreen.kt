@@ -113,7 +113,6 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                 )
             }
 
-            // Other group members' markers
             state.members
                 .filter { it.uid != state.currentUserId }
                 .forEach { member ->
@@ -123,7 +122,6 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                         snippet = "ID: ${member.uid.take(8)}"
                     )
 
-                    // Draw lines from my location to each member
                     state.myLocation?.let { my ->
                         Polyline(
                             points = listOf(my, member.toLatLng()),
@@ -141,7 +139,6 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
             memberCount = state.members.size
         )
 
-        // Distance Card (Bottom)
         Card(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
