@@ -1,5 +1,8 @@
 package com.pinpoint.navigation
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -11,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.compose.rememberNavController
+import com.example.tutorlog.design.LocalColors
 import com.pinpoint.R
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.generated.NavGraphs
@@ -29,8 +33,8 @@ enum class BottomBarItem(
     val label: String
 ) {
     Location(MapScreenDestination, R.drawable.ballooon, "Location"),
-    Profile(ProfileScreenDestination, R.drawable.ballooon, "Profile"),
-    Groups(GroupsScreenDestination, R.drawable.ballooon, "Groups")
+    Groups(GroupsScreenDestination, R.drawable.ballooon, "Groups"),
+    Profile(ProfileScreenDestination, R.drawable.ballooon, "Profile")
 }
 
 @Composable
@@ -41,6 +45,9 @@ fun AppNavigation() {
     val shouldShowBottomBar = currentDestination in BottomBarItem.entries.map { it.direction }
 
     Scaffold(
+        modifier = Modifier.fillMaxSize()
+            .background(LocalColors.Gray900),
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         bottomBar = {
             if (shouldShowBottomBar) {
                 val navigator = navController.rememberDestinationsNavigator()

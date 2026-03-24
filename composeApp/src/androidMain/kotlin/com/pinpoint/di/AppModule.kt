@@ -1,6 +1,7 @@
 package com.pinpoint.di
 
 import android.content.Context
+import com.pinpoint.domain.preferences.UserPreferences
 import com.pinpoint.util.LocationHelper
 import com.pinpoint.domain.repository.FirebaseLocationRepository
 import dagger.Module
@@ -24,5 +25,11 @@ object AppModule {
     @Singleton
     fun provideFirebaseLocationRepository(): FirebaseLocationRepository {
         return FirebaseLocationRepository()
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserPreferences(@ApplicationContext context: Context): UserPreferences {
+        return UserPreferences(context)
     }
 }

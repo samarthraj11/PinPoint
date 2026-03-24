@@ -3,10 +3,20 @@ package com.pinpoint.feature.map
 import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,7 +28,14 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
-import com.google.maps.android.compose.*
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.Polyline
+import com.google.maps.android.compose.rememberCameraPositionState
+import com.pinpoint.feature.map.composable.WelcomeUserComposable
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import org.orbitmvi.orbit.compose.collectAsState
@@ -96,7 +113,6 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                 )
             }
 
-            // Other group members' markers
             state.members
                 .filter { it.uid != state.currentUserId }
                 .forEach { member ->
@@ -106,7 +122,6 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                         snippet = "ID: ${member.uid.take(8)}"
                     )
 
-                    // Draw lines from my location to each member
                     state.myLocation?.let { my ->
                         Polyline(
                             points = listOf(my, member.toLatLng()),
@@ -117,38 +132,13 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                 }
         }
 
-        // Active Trip Info Card (Top)
-        Card(
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = 48.dp, start = 16.dp, end = 16.dp)
-                .fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF1976D2)),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Group ${state.groupId}",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-                Text(
-                    text = "${state.members.size} member${if (state.members.size != 1) "s" else ""}",
-                    fontSize = 14.sp,
-                    color = Color.White.copy(alpha = 0.8f)
-                )
-            }
-        }
+        WelcomeUserComposable(
+            displayName = state.currentUserDisplayName,
+            photoUrl = state.currentUserPhotoUrl,
+            groupId = state.groupId,
+            memberCount = state.members.size
+        )
 
-        // Distance Card (Bottom)
         Card(
             modifier = Modifier
                 .align(Alignment.BottomCenter)

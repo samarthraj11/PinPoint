@@ -3,6 +3,7 @@ package com.pinpoint.feature.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pinpoint.domain.model.UIGoogleUserInfo
+import com.pinpoint.domain.preferences.UserPreferences
 import com.pinpoint.domain.repository.FirebaseLocationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -15,11 +16,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val locationRepository: FirebaseLocationRepository
+    private val locationRepository: FirebaseLocationRepository,
+    private val userPreferences: UserPreferences
 ): ContainerHost<LoginScreenState, LoginScreenSideEffect>, ViewModel() {
 
     override val container: Container<LoginScreenState, LoginScreenSideEffect> = container(initialState = LoginScreenState())
-
 
     fun onSignIn() {
         viewModelScope.launch {
@@ -36,7 +37,7 @@ class LoginViewModel @Inject constructor(
 
     fun saveLocalUser(userInfo: UIGoogleUserInfo) {
         viewModelScope.launch {
-
+            userPreferences.saveUid(userInfo.uid)
         }
     }
 
