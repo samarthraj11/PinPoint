@@ -27,7 +27,12 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.foundation.text.ClickableText
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -71,12 +76,7 @@ fun LoginComposable(
 
                 Spacer(modifier = Modifier.height(40.dp))
 
-                Text(
-                    text = "By signing in, you agree to our terms and privacy policy.",
-                    fontSize = 14.sp,
-                    color = LocalColors.Gray400,
-                    textAlign = TextAlign.Center
-                )
+                PrivacyPolicyText()
             }
         }
     }
@@ -123,7 +123,7 @@ private fun TitleSection() {
         Spacer(modifier = Modifier.height(12.dp))
 
         Text(
-            text = "Sign in to manage your classes",
+            text = "Sign in to share your location",
             fontSize = 14.sp,
             color = LocalColors.Gray400
         )
@@ -178,6 +178,57 @@ private fun GoogleSignInButton(
             }
         }
     }
+}
+
+@Composable
+private fun PrivacyPolicyText() {
+    val uriHandler = LocalUriHandler.current
+    val privacyPolicyUrl = "https://samarthraj11.github.io/PinPoint/privacy-policy"
+    val termsUrl = "https://samarthraj11.github.io/PinPoint/terms"
+
+    val annotatedString = buildAnnotatedString {
+        withStyle(SpanStyle(color = LocalColors.Gray400, fontSize = 14.sp)) {
+            append("By signing in, you agree to our ")
+        }
+        pushStringAnnotation(tag = "TERMS", annotation = termsUrl)
+        withStyle(
+            SpanStyle(
+                color = LocalColors.PrimaryGreen,
+                fontSize = 14.sp,
+                textDecoration = TextDecoration.Underline
+            )
+        ) {
+            append("Terms of Service")
+        }
+        pop()
+        withStyle(SpanStyle(color = LocalColors.Gray400, fontSize = 14.sp)) {
+            append(" and ")
+        }
+        pushStringAnnotation(tag = "PRIVACY", annotation = privacyPolicyUrl)
+        withStyle(
+            SpanStyle(
+                color = LocalColors.PrimaryGreen,
+                fontSize = 14.sp,
+                textDecoration = TextDecoration.Underline
+            )
+        ) {
+            append("Privacy Policy")
+        }
+        pop()
+        withStyle(SpanStyle(color = LocalColors.Gray400, fontSize = 14.sp)) {
+            append(".")
+        }
+    }
+
+    ClickableText(
+        text = annotatedString,
+        onClick = { offset ->
+            annotatedString.getStringAnnotations("TERMS", offset, offset)
+                .firstOrNull()?.let { uriHandler.openUri(it.item) }
+            annotatedString.getStringAnnotations("PRIVACY", offset, offset)
+                .firstOrNull()?.let { uriHandler.openUri(it.item) }
+        }
+    )
 }
 
 // Preview

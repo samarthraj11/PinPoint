@@ -41,7 +41,6 @@ class LocationHelper(private val context: Context) {
         // Fetch last known location immediately as a fallback
         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
             location?.let {
-                println("karl helper: $it")
                 _currentLocation.value = it
             }
         }
