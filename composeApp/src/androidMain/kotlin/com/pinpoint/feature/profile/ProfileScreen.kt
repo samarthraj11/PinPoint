@@ -26,6 +26,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.SubcomposeAsyncImage
 import coil.compose.AsyncImage
 import com.example.tutorlog.design.LocalColors
 import com.google.firebase.Firebase
@@ -128,32 +129,18 @@ fun ProfileScreen(
                             .border(4.dp, LocalColors.Primary, CircleShape)
                             .padding(4.dp)
                             .clip(CircleShape)
-                            .background(LocalColors.BackgroundDark)
+                            .background(LocalColors.PrimaryLight)
                     ) {
-                        if (photoUrl != null) {
-                            AsyncImage(
-                                model = photoUrl,
-                                contentDescription = "Profile Avatar",
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .clip(CircleShape),
-                                contentScale = ContentScale.Crop
-                            )
-                        } else {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(LocalColors.PrimaryLight, CircleShape),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = displayName.take(2).uppercase(),
-                                    fontSize = 40.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = LocalColors.Primary
-                                )
-                            }
-                        }
+                        SubcomposeAsyncImage(
+                            model = photoUrl,
+                            contentDescription = "Profile Avatar of $displayName",
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(CircleShape),
+                            contentScale = ContentScale.Crop,
+                            loading = { InitialsPlaceholder(displayName) },
+                            error = { InitialsPlaceholder(displayName) }
+                        )
                     }
                     // Edit button
                     Box(
@@ -531,5 +518,22 @@ private fun SettingsRow(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun InitialsPlaceholder(displayName: String) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(LocalColors.PrimaryLight, CircleShape),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = displayName.take(2).uppercase(),
+            fontSize = 40.sp,
+            fontWeight = FontWeight.Bold,
+            color = LocalColors.Primary
+        )
     }
 }
