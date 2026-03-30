@@ -3,10 +3,10 @@ package com.pinpoint.feature.map
 import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -36,16 +37,21 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
+import com.pinpoint.design.BottomTab
+import com.pinpoint.design.PinPointBottomBar
 import com.pinpoint.feature.map.composable.WelcomeUserComposable
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 
 @Destination<RootGraph>
 @Composable
-fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
-
+fun MapScreen(
+    navigator: DestinationsNavigator,
+    viewModel: MapViewModel = hiltViewModel()
+) {
     val state by viewModel.collectAsState()
 
     viewModel.collectSideEffect { sideEffect ->
@@ -95,78 +101,93 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        GoogleMap(
-            modifier = Modifier.fillMaxSize(),
-            cameraPositionState = cameraPositionState,
-            properties = MapProperties(isMyLocationEnabled = false),
-            uiSettings = MapUiSettings(zoomControlsEnabled = true)
+    Scaffold(
+        containerColor = LocalColors.BackgroundDark,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        bottomBar = {
+            PinPointBottomBar(
+                currentTab = BottomTab.Explore,
+                navigator = navigator
+            )
+        }
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
         ) {
-            state.myLocation?.let {
-                Marker(
-                    state = MarkerState(position = it),
-                    title = "You",
-                    snippet = "Your current location"
-                )
+            GoogleMap(
+                modifier = Modifier.fillMaxSize(),
+                cameraPositionState = cameraPositionState,
+                properties = MapProperties(isMyLocationEnabled = false),
+                uiSettings = MapUiSettings(zoomControlsEnabled = true)
+            ) {
+                state.myLocation?.let {
+                    Marker(
+                        state = MarkerState(position = it),
+                        title = "You",
+                        snippet = "Your current location"
+                    )
+                }
+
+                state.members
+                    .filter { it.uid != state.currentUserId }
+                    .forEach { member ->
+                        Marker(
+                            state = MarkerState(position = member.toLatLng()),
+                            title = member.displayName,
+                            snippet = "ID: ${member.uid.take(8)}"
+                        )
+
+                        state.myLocation?.let { my ->
+                            Polyline(
+                                points = listOf(my, member.toLatLng()),
+                                color = LocalColors.Primary,
+                                width = 6f
+                            )
+                        }
+                    }
             }
 
-            state.members
-                .filter { it.uid != state.currentUserId }
-                .forEach { member ->
-                    Marker(
-                        state = MarkerState(position = member.toLatLng()),
-                        title = member.displayName,
-                        snippet = "ID: ${member.uid.take(8)}"
-                    )
+            WelcomeUserComposable(
+                displayName = state.currentUserDisplayName,
+                photoUrl = state.currentUserPhotoUrl,
+                groupId = state.groupId,
+                memberCount = state.members.size
+            )
 
-                    state.myLocation?.let { my ->
-                        Polyline(
-                            points = listOf(my, member.toLatLng()),
-                            color = LocalColors.Primary,
-                            width = 6f
-                        )
-                    }
-                }
-        }
-
-        WelcomeUserComposable(
-            displayName = state.currentUserDisplayName,
-            photoUrl = state.currentUserPhotoUrl,
-            groupId = state.groupId,
-            memberCount = state.members.size
-        )
-
-        Card(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(16.dp)
-                .fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = LocalColors.SurfaceDark),
-            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(20.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+            Card(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(16.dp)
+                    .fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = LocalColors.SurfaceDark),
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
             ) {
-                Text(
-                    text = "Distance",
-                    fontSize = 14.sp,
-                    color = LocalColors.TextSecondary
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = state.distance,
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = LocalColors.Primary
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = if (state.members.size > 1) "to nearest group member" else "waiting for members",
-                    fontSize = 12.sp,
-                    color = LocalColors.TextSecondary
-                )
+                Column(
+                    modifier = Modifier.padding(20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Distance",
+                        fontSize = 14.sp,
+                        color = LocalColors.TextSecondary
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = state.distance,
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = LocalColors.Primary
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = if (state.members.size > 1) "to nearest group member" else "waiting for members",
+                        fontSize = 12.sp,
+                        color = LocalColors.TextSecondary
+                    )
+                }
             }
         }
     }

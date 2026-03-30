@@ -1,5 +1,6 @@
 package com.pinpoint.feature.profile
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -14,10 +15,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tutorlog.design.LocalColors
+import com.pinpoint.design.BottomTab
+import com.pinpoint.design.PinPointBottomBar
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.NavGraphs
 import com.ramcosta.composedestinations.generated.destinations.LoginScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.MapScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.orbitmvi.orbit.compose.collectSideEffect
 
@@ -27,6 +31,16 @@ fun ProfileScreen(
     navigator: DestinationsNavigator,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
+    // Back press navigates to Map instead of closing app
+    BackHandler {
+        navigator.navigate(MapScreenDestination) {
+            popUpTo(MapScreenDestination) {
+                inclusive = false
+            }
+            launchSingleTop = true
+        }
+    }
+
     viewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
             is ProfileScreenSideEffect.NavigateToLogin -> {
@@ -40,72 +54,84 @@ fun ProfileScreen(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(LocalColors.BackgroundDark)
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Box(
-            modifier = Modifier
-                .size(100.dp)
-                .clip(CircleShape)
-                .background(LocalColors.PrimaryLight),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = "SR",
-                fontSize = 36.sp,
-                fontWeight = FontWeight.Bold,
-                color = LocalColors.Primary
+    Scaffold(
+        containerColor = LocalColors.BackgroundDark,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        bottomBar = {
+            PinPointBottomBar(
+                currentTab = BottomTab.Profile,
+                navigator = navigator
             )
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "Samarth Raj",
-            fontSize = 22.sp,
-            fontWeight = FontWeight.Bold,
-            color = LocalColors.TextPrimary
-        )
-
-        Text(
-            text = "samarth@example.com",
-            fontSize = 14.sp,
-            color = LocalColors.TextSecondary
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        ProfileInfoCard(label = "Phone", value = "+91 98765 43210")
-        Spacer(modifier = Modifier.height(12.dp))
-        ProfileInfoCard(label = "Location", value = "New Delhi, India")
-        Spacer(modifier = Modifier.height(12.dp))
-        ProfileInfoCard(label = "Status", value = "Available")
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        Button(
-            onClick = { viewModel.logout() },
+    ) { innerPadding ->
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = LocalColors.Red400
-            )
+                .fillMaxSize()
+                .padding(innerPadding)
+                .background(LocalColors.BackgroundDark)
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Box(
+                modifier = Modifier
+                    .size(100.dp)
+                    .clip(CircleShape)
+                    .background(LocalColors.PrimaryLight),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "SR",
+                    fontSize = 36.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = LocalColors.Primary
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             Text(
-                text = "Logout",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium,
-                color = LocalColors.White,
-                modifier = Modifier.padding(vertical = 4.dp)
+                text = "Samarth Raj",
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+                color = LocalColors.TextPrimary
             )
+
+            Text(
+                text = "samarth@example.com",
+                fontSize = 14.sp,
+                color = LocalColors.TextSecondary
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            ProfileInfoCard(label = "Phone", value = "+91 98765 43210")
+            Spacer(modifier = Modifier.height(12.dp))
+            ProfileInfoCard(label = "Location", value = "New Delhi, India")
+            Spacer(modifier = Modifier.height(12.dp))
+            ProfileInfoCard(label = "Status", value = "Available")
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            Button(
+                onClick = { viewModel.logout() },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = LocalColors.Red400
+                )
+            ) {
+                Text(
+                    text = "Logout",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = LocalColors.White,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
+            }
         }
     }
 }
