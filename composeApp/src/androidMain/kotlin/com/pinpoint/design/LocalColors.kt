@@ -3,6 +3,27 @@ package com.example.tutorlog.design
 import androidx.compose.ui.graphics.Color
 
 object LocalColors {
+    // Primary brand color (orange from HTML design)
+    val Primary: Color = Color(0xFFF48C25)
+    val PrimaryLight: Color = Color(0xFFF48C25).copy(alpha = 0.2f)
+    val PrimaryDim: Color = Color(0xFFF48C25).copy(alpha = 0.1f)
+    val PrimaryShadow: Color = Color(0xFFF48C25).copy(alpha = 0.4f)
+
+    // Backgrounds from HTML design
+    val BackgroundLight: Color = Color(0xFFF8F7F5)
+    val BackgroundDark: Color = Color(0xFF221910)
+
+    // Surface colors
+    val SurfaceLight: Color = Color(0xFFFFFFFF)
+    val SurfaceDark: Color = Color(0xFF2D2118)
+    val SurfaceDarkElevated: Color = Color(0xFF3A2D20)
+
+    // Text colors
+    val TextPrimary: Color = Color(0xFFF1F0EE)
+    val TextSecondary: Color = Color(0xFF94A3B8)
+    val TextMuted: Color = Color(0xFF64748B)
+
+    // Red shades
     val Red100: Color = Color(0xFFFFCDD2)
     val Red200: Color = Color(0xFFEF9A9A)
     val Red300: Color = Color(0xFFE57373)
@@ -45,8 +66,8 @@ object LocalColors {
     val Gray500: Color = Color(0xFF9E9E9E)
     val Gray600 = Color(0xFF4B5563)
     val Gray700 = Color(0xFF374151)
-    val Gray900 = Color(0xFF111827)
     val Gray800 = Color(0xFF1F2937)
+    val Gray900 = Color(0xFF111827)
 
     val White100: Color = Color(0xFFFFFFFF).copy(alpha = 0.1f)
     val White200: Color = Color(0xFFFFFFFF).copy(alpha = 0.2f)
@@ -87,11 +108,13 @@ object LocalColors {
 
     val PrimaryGreen = Color(0xFF38E07B)
 
-
-
     val White: Color = Color(0xFFFFFFFF)
     val Black: Color = Color(0xFF000000)
 
     val BackgroundDefaultDark = Color(0xFF111714)
     val LightGreen = Color(0xFF38e07b)
+
+    // Border colors matching HTML
+    val BorderLight: Color = Color(0xFFF48C25).copy(alpha = 0.1f)
+    val BorderMedium: Color = Color(0xFFF48C25).copy(alpha = 0.2f)
 }

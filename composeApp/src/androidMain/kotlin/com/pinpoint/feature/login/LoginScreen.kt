@@ -30,13 +30,11 @@ fun LoginScreen(
     navigator: DestinationsNavigator,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
-
     val state by viewModel.collectAsState()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val launcher =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) {}
-
 
     viewModel.collectSideEffect {
         when(it) {
@@ -66,19 +64,16 @@ fun LoginScreen(
         }
     }
 
-
     Scaffold(
         modifier = Modifier
-            .background(color = LocalColors.Gray900)
+            .background(color = LocalColors.BackgroundDark)
             .fillMaxSize(),
-        contentWindowInsets = WindowInsets(0, 0, 0, 0)
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        containerColor = LocalColors.BackgroundDark
     ) { contentPadding ->
         LoginComposable(
-            modifier = Modifier
-                .padding(contentPadding),
-            onGoogleSignInClick = {
-                viewModel.onSignIn()
-            },
+            modifier = Modifier.padding(contentPadding),
+            onGoogleSignInClick = { viewModel.onSignIn() },
             isLoading = state.isLoading
         )
     }

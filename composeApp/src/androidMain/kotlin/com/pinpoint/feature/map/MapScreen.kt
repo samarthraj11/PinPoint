@@ -3,6 +3,7 @@ package com.pinpoint.feature.map
 import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -19,11 +20,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.tutorlog.design.LocalColors
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -49,9 +50,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
 
     viewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
-            is MapScreenSideEffect.ShowError -> {
-                // Handle error display
-            }
+            is MapScreenSideEffect.ShowError -> {}
         }
     }
 
@@ -97,14 +96,12 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
             properties = MapProperties(isMyLocationEnabled = false),
             uiSettings = MapUiSettings(zoomControlsEnabled = true)
         ) {
-            // My Location Marker
             state.myLocation?.let {
                 Marker(
                     state = MarkerState(position = it),
@@ -125,7 +122,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                     state.myLocation?.let { my ->
                         Polyline(
                             points = listOf(my, member.toLatLng()),
-                            color = Color.Blue,
+                            color = LocalColors.Primary,
                             width = 6f
                         )
                     }
@@ -145,7 +142,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                 .padding(16.dp)
                 .fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = LocalColors.SurfaceDark),
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
         ) {
             Column(
@@ -153,22 +150,22 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "📍 Distance",
+                    text = "Distance",
                     fontSize = 14.sp,
-                    color = Color.Gray
+                    color = LocalColors.TextSecondary
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = state.distance,
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF1976D2)
+                    color = LocalColors.Primary
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = if (state.members.size > 1) "to nearest group member" else "waiting for members",
                     fontSize = 12.sp,
-                    color = Color.Gray
+                    color = LocalColors.TextSecondary
                 )
             }
         }

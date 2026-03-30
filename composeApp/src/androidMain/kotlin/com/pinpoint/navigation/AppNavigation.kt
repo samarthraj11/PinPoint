@@ -7,12 +7,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.example.tutorlog.design.LocalColors
 import com.pinpoint.R
@@ -32,7 +36,7 @@ enum class BottomBarItem(
     val icon: Int,
     val label: String
 ) {
-    Location(MapScreenDestination, R.drawable.ballooon, "Location"),
+    Location(MapScreenDestination, R.drawable.ballooon, "Explore"),
     Groups(GroupsScreenDestination, R.drawable.ballooon, "Groups"),
     Profile(ProfileScreenDestination, R.drawable.ballooon, "Profile")
 }
@@ -45,13 +49,18 @@ fun AppNavigation() {
     val shouldShowBottomBar = currentDestination in BottomBarItem.entries.map { it.direction }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize()
-            .background(LocalColors.Gray900),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(LocalColors.BackgroundDark),
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        containerColor = LocalColors.BackgroundDark,
         bottomBar = {
             if (shouldShowBottomBar) {
                 val navigator = navController.rememberDestinationsNavigator()
-                NavigationBar {
+                NavigationBar(
+                    containerColor = LocalColors.BackgroundDark,
+                    tonalElevation = 0.dp
+                ) {
                     BottomBarItem.entries.forEach { item ->
                         val isCurrentDestOnBackStack by navController.isRouteOnBackStackAsState(item.direction)
                         NavigationBarItem(
@@ -75,7 +84,20 @@ fun AppNavigation() {
                                     contentDescription = item.label
                                 )
                             },
-                            label = { Text(item.label) }
+                            label = {
+                                Text(
+                                    item.label,
+                                    fontSize = 10.sp,
+                                    fontWeight = if (isCurrentDestOnBackStack) FontWeight.Bold else FontWeight.Normal
+                                )
+                            },
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor = LocalColors.Primary,
+                                selectedTextColor = LocalColors.Primary,
+                                unselectedIconColor = LocalColors.TextSecondary,
+                                unselectedTextColor = LocalColors.TextSecondary,
+                                indicatorColor = LocalColors.PrimaryDim
+                            )
                         )
                     }
                 }

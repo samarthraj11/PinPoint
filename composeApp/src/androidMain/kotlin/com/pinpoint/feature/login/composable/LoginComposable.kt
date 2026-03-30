@@ -42,7 +42,7 @@ fun LoginComposable(
 ) {
     Surface(
         modifier = modifier.fillMaxSize(),
-        color = LocalColors.Gray900
+        color = LocalColors.BackgroundDark
     ) {
         Box(
             modifier = Modifier
@@ -55,26 +55,16 @@ fun LoginComposable(
                 verticalArrangement = Arrangement.Center,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                // Logo Section
                 LogoSection()
-
                 Spacer(modifier = Modifier.height(40.dp))
-
-                // Title Section
                 TitleSection()
-
                 Spacer(modifier = Modifier.height(32.dp))
-
-                // Sign In Button
                 GoogleSignInButton(onClick = onGoogleSignInClick, isLoading = isLoading)
-
-
                 Spacer(modifier = Modifier.height(40.dp))
-
                 Text(
                     text = "By signing in, you agree to our terms and privacy policy.",
                     fontSize = 14.sp,
-                    color = LocalColors.Gray400,
+                    color = LocalColors.TextSecondary,
                     textAlign = TextAlign.Center
                 )
             }
@@ -89,19 +79,21 @@ private fun LogoSection() {
             .size(96.dp)
             .shadow(
                 elevation = 24.dp,
-                shape = CircleShape
+                shape = CircleShape,
+                ambientColor = LocalColors.PrimaryShadow,
+                spotColor = LocalColors.PrimaryShadow
             )
             .background(
-                color = LocalColors.Gray800,
+                color = LocalColors.SurfaceDark,
                 shape = CircleShape
             ),
         contentAlignment = Alignment.Center
     ) {
         Icon(
             painter = painterResource(R.drawable.ballooon),
-            contentDescription = "Music Note",
+            contentDescription = "PinPoint Logo",
             modifier = Modifier.size(60.dp),
-            tint = LocalColors.PrimaryGreen
+            tint = LocalColors.Primary
         )
     }
 }
@@ -116,16 +108,14 @@ private fun TitleSection() {
             text = "Welcome Back",
             fontSize = 30.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.White,
+            color = LocalColors.TextPrimary,
             letterSpacing = (-0.5).sp
         )
-
         Spacer(modifier = Modifier.height(12.dp))
-
         Text(
-            text = "Sign in to manage your classes",
+            text = "Sign in to track and share your location",
             fontSize = 14.sp,
-            color = LocalColors.Gray400
+            color = LocalColors.TextSecondary
         )
     }
 }
@@ -142,8 +132,8 @@ private fun GoogleSignInButton(
             .height(56.dp),
         shape = RoundedCornerShape(12.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color.White,
-            contentColor = Color.Black
+            containerColor = LocalColors.Primary,
+            contentColor = Color.White
         ),
         elevation = ButtonDefaults.buttonElevation(
             defaultElevation = 2.dp,
@@ -157,7 +147,7 @@ private fun GoogleSignInButton(
         ) {
             if (isLoading) {
                 CircularProgressIndicator(
-                    color = LocalColors.Gray900,
+                    color = Color.White,
                     strokeWidth = 4.dp,
                     modifier = Modifier.size(16.dp)
                 )
@@ -166,10 +156,9 @@ private fun GoogleSignInButton(
                     painter = painterResource(id = R.drawable.ballooon),
                     contentDescription = "Google Logo",
                     modifier = Modifier.size(24.dp),
-                    tint = Color.Unspecified
+                    tint = Color.White
                 )
                 Spacer(modifier = Modifier.width(12.dp))
-
                 Text(
                     text = "Sign in with Google",
                     fontSize = 16.sp,
@@ -180,7 +169,6 @@ private fun GoogleSignInButton(
     }
 }
 
-// Preview
 @Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
@@ -189,5 +177,3 @@ fun LoginScreenPreview() {
         isLoading = true,
     )
 }
-
-

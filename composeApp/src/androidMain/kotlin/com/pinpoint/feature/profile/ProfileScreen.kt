@@ -13,6 +13,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.tutorlog.design.LocalColors
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.NavGraphs
@@ -26,7 +27,6 @@ fun ProfileScreen(
     navigator: DestinationsNavigator,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
-
     viewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
             is ProfileScreenSideEffect.NavigateToLogin -> {
@@ -43,24 +43,24 @@ fun ProfileScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(LocalColors.BackgroundDark)
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Avatar placeholder
         Box(
             modifier = Modifier
                 .size(100.dp)
                 .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primaryContainer),
+                .background(LocalColors.PrimaryLight),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = "SR",
                 fontSize = 36.sp,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
+                color = LocalColors.Primary
             )
         }
 
@@ -69,18 +69,18 @@ fun ProfileScreen(
         Text(
             text = "Samarth Raj",
             fontSize = 22.sp,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            color = LocalColors.TextPrimary
         )
 
         Text(
             text = "samarth@example.com",
             fontSize = 14.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = LocalColors.TextSecondary
         )
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Profile info cards
         ProfileInfoCard(label = "Phone", value = "+91 98765 43210")
         Spacer(modifier = Modifier.height(12.dp))
         ProfileInfoCard(label = "Location", value = "New Delhi, India")
@@ -89,7 +89,6 @@ fun ProfileScreen(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        // Logout button
         Button(
             onClick = { viewModel.logout() },
             modifier = Modifier
@@ -97,13 +96,14 @@ fun ProfileScreen(
                 .padding(bottom = 16.dp),
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.error
+                containerColor = LocalColors.Red400
             )
         ) {
             Text(
                 text = "Logout",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
+                color = LocalColors.White,
                 modifier = Modifier.padding(vertical = 4.dp)
             )
         }
@@ -116,20 +116,24 @@ private fun ProfileInfoCard(label: String, value: String) {
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
+            containerColor = LocalColors.SurfaceDark
+        ),
+        border = CardDefaults.outlinedCardBorder().copy(
+            brush = androidx.compose.ui.graphics.SolidColor(LocalColors.BorderLight)
         )
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
                 text = label,
                 fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = LocalColors.TextSecondary
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = value,
                 fontSize = 16.sp,
-                fontWeight = FontWeight.Medium
+                fontWeight = FontWeight.Medium,
+                color = LocalColors.TextPrimary
             )
         }
     }
