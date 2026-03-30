@@ -9,8 +9,9 @@ import androidx.lifecycle.ViewModel
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
-import com.pinpoint.util.LocationHelper
+import com.pinpoint.domain.repository.FirebaseGroupRepository
 import com.pinpoint.domain.repository.FirebaseLocationRepository
+import com.pinpoint.util.LocationHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
 import org.orbitmvi.orbit.Container
@@ -22,7 +23,8 @@ import javax.inject.Inject
 class MapViewModel @Inject constructor(
     private val application: Application,
     private val locationRepository: FirebaseLocationRepository,
-    private val locationHelper: LocationHelper
+    private val locationHelper: LocationHelper,
+    private val groupRepository: FirebaseGroupRepository
 ) : ContainerHost<MapScreenState, MapScreenSideEffect>, ViewModel() {
 
     override val container: Container<MapScreenState, MapScreenSideEffect> =
@@ -36,10 +38,16 @@ class MapViewModel @Inject constructor(
                         currentUserPhotoUrl = user.photoUrl?.toString()
                     )
                 }
+                observeUserGroups(user.uid)
             }
             startTrackingIfPermitted()
-            observeGroupMembers()
         }
+
+    private fun observeUserGroups(uid: String) = intent {
+        groupRepository.observeUserGroups(uid).collectLatest { groups ->
+            reduce { state.copy(groups = groups, isLoadingGroups = false) }
+        }
+    }
 
     private fun startTrackingIfPermitted() = intent {
         val hasPermission = ContextCompat.checkSelfPermission(
@@ -58,26 +66,7 @@ class MapViewModel @Inject constructor(
             location?.let {
                 val latLng = LatLng(it.latitude, it.longitude)
                 reduce { state.copy(myLocation = latLng) }
-                updateDistanceToNearest(latLng)
-                pushLocationToFirebase(it.latitude, it.longitude)
             }
-        }
-    }
-
-    private fun pushLocationToFirebase(lat: Double, lng: Double) {
-        val user = Firebase.auth.currentUser ?: return
-        locationRepository.updateMyLocation(
-            uid = user.uid,
-            displayName = user.displayName ?: "Unknown",
-            lat = lat,
-            lng = lng
-        )
-    }
-
-    private fun observeGroupMembers() = intent {
-        locationRepository.observeMembers().collectLatest { members ->
-            reduce { state.copy(members = members) }
-            state.myLocation?.let { updateDistanceToNearest(it) }
         }
     }
 
@@ -88,38 +77,83 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    private fun updateDistanceToNearest(myLocation: LatLng) = intent {
-        val otherMembers = state.members.filter { it.uid != state.currentUserId }
-        if (otherMembers.isEmpty()) {
-            reduce { state.copy(distance = "No other members nearby") }
+    // Create / Join group actions for the placeholder screen
+    fun showCreateDialog() = intent {
+        reduce { state.copy(showCreateDialog = true, createGroupName = "") }
+    }
+
+    fun hideCreateDialog() = intent {
+        reduce { state.copy(showCreateDialog = false) }
+    }
+
+    fun showJoinDialog() = intent {
+        reduce { state.copy(showJoinDialog = true, joinGroupId = "") }
+    }
+
+    fun hideJoinDialog() = intent {
+        reduce { state.copy(showJoinDialog = false) }
+    }
+
+    fun onCreateGroupNameChange(name: String) = intent {
+        reduce { state.copy(createGroupName = name) }
+    }
+
+    fun onJoinGroupIdChange(id: String) = intent {
+        reduce { state.copy(joinGroupId = id) }
+    }
+
+    fun createGroup() = intent {
+        val name = state.createGroupName.trim()
+        if (name.isEmpty()) {
+            postSideEffect(MapScreenSideEffect.ShowError("Group name cannot be empty"))
             return@intent
         }
-        var minDistance = Float.MAX_VALUE
-        var nearestName = ""
-        otherMembers.forEach { member ->
-            val results = FloatArray(1)
-            Location.distanceBetween(
-                myLocation.latitude, myLocation.longitude,
-                member.latitude, member.longitude,
-                results
+        reduce { state.copy(isCreating = true) }
+        try {
+            val groupId = groupRepository.createGroup(
+                name = name,
+                creatorUid = state.currentUserId,
+                creatorName = state.currentUserDisplayName,
+                creatorPhotoUrl = state.currentUserPhotoUrl
             )
-            if (results[0] < minDistance) {
-                minDistance = results[0]
-                nearestName = member.displayName
+            reduce { state.copy(isCreating = false, showCreateDialog = false) }
+            postSideEffect(MapScreenSideEffect.ShowSuccess("Group created!"))
+            postSideEffect(MapScreenSideEffect.NavigateToGroupDetail(groupId, name))
+        } catch (e: Exception) {
+            reduce { state.copy(isCreating = false) }
+            postSideEffect(MapScreenSideEffect.ShowError("Failed to create group: ${e.message}"))
+        }
+    }
+
+    fun joinGroup() = intent {
+        val groupId = state.joinGroupId.trim()
+        if (groupId.isEmpty()) {
+            postSideEffect(MapScreenSideEffect.ShowError("Group ID cannot be empty"))
+            return@intent
+        }
+        reduce { state.copy(isJoining = true) }
+        try {
+            val success = groupRepository.joinGroup(
+                groupId = groupId,
+                uid = state.currentUserId,
+                displayName = state.currentUserDisplayName,
+                photoUrl = state.currentUserPhotoUrl
+            )
+            if (success) {
+                reduce { state.copy(isJoining = false, showJoinDialog = false) }
+                postSideEffect(MapScreenSideEffect.ShowSuccess("Joined group!"))
+            } else {
+                reduce { state.copy(isJoining = false) }
+                postSideEffect(MapScreenSideEffect.ShowError("Group not found"))
             }
+        } catch (e: Exception) {
+            reduce { state.copy(isJoining = false) }
+            postSideEffect(MapScreenSideEffect.ShowError("Failed to join group: ${e.message}"))
         }
-        val distanceText = if (minDistance >= 1000) {
-            String.format("%.2f km to %s", minDistance / 1000, nearestName)
-        } else {
-            String.format("%.0f m to %s", minDistance, nearestName)
-        }
-        reduce { state.copy(distance = distanceText) }
     }
 
     override fun onCleared() {
         super.onCleared()
         locationHelper.stopLocationUpdates()
-        val user = Firebase.auth.currentUser
-        user?.let { locationRepository.removeMyLocation(it.uid) }
     }
 }
