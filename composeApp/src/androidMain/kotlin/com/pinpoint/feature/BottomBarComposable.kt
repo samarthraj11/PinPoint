@@ -16,6 +16,7 @@ fun BottomBarComposable(modifier: Modifier = Modifier) {
         modifier = modifier.fillMaxWidth()
             .background(LocalColors.BackgroundDark)
             .padding(vertical = 12.dp)
+            .padding(horizontal = 24.dp)
     ) {
 
     }
