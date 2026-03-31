@@ -11,7 +11,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -22,8 +21,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -36,7 +33,7 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.compose.*
-import com.pinpoint.domain.model.MemberLocation
+import com.pinpoint.feature.group.detail.composable.MemberRowComposable
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -294,7 +291,7 @@ fun GroupDetailScreen(
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     items(state.members, key = { it.uid }) { member ->
-                        MemberRow(
+                        MemberRowComposable(
                             member = member,
                             isCurrentUser = member.uid == state.currentUserId,
                             myLocation = state.myLocation
@@ -306,89 +303,3 @@ fun GroupDetailScreen(
     }
 }
 
-@Composable
-private fun MemberRow(
-    member: MemberLocation,
-    isCurrentUser: Boolean,
-    myLocation: LatLng?
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(
-            modifier = Modifier
-                .size(42.dp)
-                .clip(CircleShape)
-                .background(
-                    if (isCurrentUser) LocalColors.Primary else LocalColors.SurfaceDarkElevated
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = member.displayName.take(1).uppercase(),
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = if (isCurrentUser) LocalColors.White else LocalColors.TextPrimary
-            )
-        }
-
-        Spacer(modifier = Modifier.width(12.dp))
-
-        Column(modifier = Modifier.weight(1f)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = member.displayName,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = LocalColors.TextPrimary
-                )
-                if (isCurrentUser) {
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = "You",
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = LocalColors.Primary,
-                        modifier = Modifier
-                            .background(
-                                LocalColors.PrimaryDim,
-                                RoundedCornerShape(4.dp)
-                            )
-                            .padding(horizontal = 6.dp, vertical = 2.dp)
-                    )
-                }
-            }
-        }
-
-        if (!isCurrentUser && myLocation != null) {
-            val results = FloatArray(1)
-            android.location.Location.distanceBetween(
-                myLocation.latitude, myLocation.longitude,
-                member.latitude, member.longitude,
-                results
-            )
-            val distance = results[0]
-            Column(horizontalAlignment = Alignment.End) {
-                Text(
-                    text = if (distance >= 1000) {
-                        String.format("%.1f km", distance / 1000)
-                    } else {
-                        String.format("%.0f m", distance)
-                    },
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = LocalColors.Primary
-                )
-                Text(
-                    text = "AWAY",
-                    fontSize = 9.sp,
-                    color = LocalColors.TextMuted,
-                    letterSpacing = 0.5.sp
-                )
-            }
-        }
-    }
-}
