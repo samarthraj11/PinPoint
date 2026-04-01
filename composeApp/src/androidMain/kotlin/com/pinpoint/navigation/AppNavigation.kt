@@ -2,6 +2,7 @@ package com.pinpoint.navigation
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
@@ -19,5 +20,6 @@ fun AppNavigation() {
         modifier = Modifier
             .fillMaxSize()
             .background(LocalColors.BackgroundDark)
+            .statusBarsPadding()
     )
 }
