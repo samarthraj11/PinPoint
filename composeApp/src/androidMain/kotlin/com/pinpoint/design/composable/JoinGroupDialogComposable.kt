@@ -16,9 +16,11 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.tutorlog.design.LocalColors
+import com.pinpoint.design.PinPointTheme
 
 @Composable
 fun JoinGroupDialogComposable(
@@ -83,4 +85,46 @@ fun JoinGroupDialogComposable(
             }
         }
     )
+}
+
+@Preview(name = "Join Group Dialog — Idle")
+@Composable
+private fun PreviewJoinGroupDialog() {
+    PinPointTheme {
+        JoinGroupDialogComposable(
+            groupId = "-NxK2abc",
+            onGroupIdChange = {},
+            onConfirm = {},
+            onDismiss = {},
+            isLoading = false
+        )
+    }
+}
+
+@Preview(name = "Join Group Dialog — Loading")
+@Composable
+private fun PreviewJoinGroupDialogLoading() {
+    PinPointTheme {
+        JoinGroupDialogComposable(
+            groupId = "-NxK2abc",
+            onGroupIdChange = {},
+            onConfirm = {},
+            onDismiss = {},
+            isLoading = true
+        )
+    }
+}
+
+@Preview(name = "Join Group Dialog — Empty ID")
+@Composable
+private fun PreviewJoinGroupDialogEmpty() {
+    PinPointTheme {
+        JoinGroupDialogComposable(
+            groupId = "",
+            onGroupIdChange = {},
+            onConfirm = {},
+            onDismiss = {},
+            isLoading = false
+        )
+    }
 }

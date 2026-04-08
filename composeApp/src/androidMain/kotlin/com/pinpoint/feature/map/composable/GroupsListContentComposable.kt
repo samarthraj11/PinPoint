@@ -13,9 +13,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.tutorlog.design.LocalColors
+import com.pinpoint.design.PinPointTheme
 import com.pinpoint.domain.model.Group
 
 @Composable
@@ -56,5 +58,33 @@ fun GroupsListContentComposable(
                 GroupQuickCardComposable(group = group, onClick = { onGroupClick(group) })
             }
         }
+    }
+}
+
+@Preview(showBackground = true, name = "Groups List — Multiple Groups")
+@Composable
+private fun PreviewGroupsListContent() {
+    PinPointTheme {
+        GroupsListContentComposable(
+            groups = listOf(
+                Group(id = "1", name = "Weekend Trip", createdBy = "uid_abc", createdByName = "Samarth", memberCount = 4),
+                Group(id = "2", name = "Family", createdBy = "uid_abc", createdByName = "Samarth", memberCount = 7),
+                Group(id = "3", name = "Work Crew", createdBy = "uid_abc", createdByName = "Samarth", memberCount = 2)
+            ),
+            onGroupClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Groups List — Single Group")
+@Composable
+private fun PreviewGroupsListContentSingle() {
+    PinPointTheme {
+        GroupsListContentComposable(
+            groups = listOf(
+                Group(id = "1", name = "Weekend Trip", createdBy = "uid_abc", createdByName = "Samarth", memberCount = 1)
+            ),
+            onGroupClick = {}
+        )
     }
 }

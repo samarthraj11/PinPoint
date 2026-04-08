@@ -23,9 +23,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.tutorlog.design.LocalColors
+import com.pinpoint.design.PinPointTheme
 import com.pinpoint.domain.model.Group
 
 @Composable
@@ -86,5 +88,59 @@ fun GroupQuickCardComposable(group: Group, onClick: () -> Unit) {
                 modifier = Modifier.size(24.dp)
             )
         }
+    }
+}
+
+@Preview(showBackground = true, name = "Group Quick Card")
+@Composable
+private fun PreviewGroupQuickCard() {
+    PinPointTheme {
+        GroupQuickCardComposable(
+            group = Group(
+                id = "-NxK2abc",
+                name = "Weekend Trip",
+                createdBy = "uid_abc123",
+                createdByName = "Samarth",
+                createdAt = 0L,
+                memberCount = 4
+            ),
+            onClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Group Quick Card — Single Member")
+@Composable
+private fun PreviewGroupQuickCardSingleMember() {
+    PinPointTheme {
+        GroupQuickCardComposable(
+            group = Group(
+                id = "-NxK2xyz",
+                name = "Solo",
+                createdBy = "uid_abc123",
+                createdByName = "Samarth",
+                createdAt = 0L,
+                memberCount = 1
+            ),
+            onClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Group Quick Card — Long Name")
+@Composable
+private fun PreviewGroupQuickCardLongName() {
+    PinPointTheme {
+        GroupQuickCardComposable(
+            group = Group(
+                id = "-NxK2long",
+                name = "This Is A Very Long Group Name That Should Ellipsize",
+                createdBy = "uid_abc123",
+                createdByName = "Samarth",
+                createdAt = 0L,
+                memberCount = 12
+            ),
+            onClick = {}
+        )
     }
 }
