@@ -77,7 +77,6 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    // Create / Join group actions for the placeholder screen
     fun showCreateDialog() = intent {
         reduce { state.copy(showCreateDialog = true, createGroupName = "") }
     }
