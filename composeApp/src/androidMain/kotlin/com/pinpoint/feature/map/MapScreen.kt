@@ -1,56 +1,62 @@
 package com.pinpoint.feature.map
 
 import android.Manifest
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Text
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.LatLngBounds
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.MapProperties
-import com.google.maps.android.compose.MapUiSettings
-import com.google.maps.android.compose.Marker
-import com.google.maps.android.compose.MarkerState
-import com.google.maps.android.compose.Polyline
-import com.google.maps.android.compose.rememberCameraPositionState
-import com.pinpoint.feature.map.composable.WelcomeUserComposable
+import com.example.tutorlog.design.LocalColors
+import com.pinpoint.design.BottomTab
+import com.pinpoint.design.PinPointBottomBar
+import com.pinpoint.design.PinPointTheme
+import com.pinpoint.design.composable.CreateGroupDialogComposable
+import com.pinpoint.design.composable.JoinGroupDialogComposable
+import com.pinpoint.domain.model.Group
+import com.pinpoint.feature.map.composable.GroupsListContentComposable
+import com.pinpoint.feature.map.composable.NoGroupsPlaceholderComposable
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
+import com.ramcosta.composedestinations.generated.destinations.GroupDetailScreenDestination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 
 @Destination<RootGraph>
 @Composable
-fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
-
+fun MapScreen(
+    navigator: DestinationsNavigator,
+    viewModel: MapViewModel = hiltViewModel()
+) {
     val state by viewModel.collectAsState()
+    val context = LocalContext.current
 
     viewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
             is MapScreenSideEffect.ShowError -> {
-                // Handle error display
+                Toast.makeText(context, sideEffect.message, Toast.LENGTH_SHORT).show()
+            }
+            is MapScreenSideEffect.ShowSuccess -> {
+                Toast.makeText(context, sideEffect.message, Toast.LENGTH_SHORT).show()
+            }
+            is MapScreenSideEffect.NavigateToGroupDetail -> {
+                navigator.navigate(
+                    GroupDetailScreenDestination(sideEffect.groupId, sideEffect.groupName)
+                )
             }
         }
     }
@@ -70,107 +76,209 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
         )
     }
 
-    val defaultPosition = LatLng(28.6139, 77.2090)
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(defaultPosition, 12f)
-    }
-
-    val allPositions = buildList {
-        state.myLocation?.let { add(it) }
-        state.members
-            .filter { it.uid != state.currentUserId }
-            .forEach { add(it.toLatLng()) }
-    }
-
-    LaunchedEffect(state.myLocation, state.members) {
-        if (allPositions.size >= 2) {
-            val bounds = LatLngBounds.builder()
-            allPositions.forEach { bounds.include(it) }
-            cameraPositionState.animate(
-                CameraUpdateFactory.newLatLngBounds(bounds.build(), 100)
-            )
-        } else if (allPositions.size == 1) {
-            cameraPositionState.animate(
-                CameraUpdateFactory.newLatLngZoom(allPositions.first(), 15f)
+    Scaffold(
+        containerColor = LocalColors.BackgroundDark,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        bottomBar = {
+            PinPointBottomBar(
+                currentTab = BottomTab.Explore,
+                navigator = navigator
             )
         }
-    }
-
-    Box(modifier = Modifier.fillMaxSize()) {
-
-        GoogleMap(
-            modifier = Modifier.fillMaxSize(),
-            cameraPositionState = cameraPositionState,
-            properties = MapProperties(isMyLocationEnabled = false),
-            uiSettings = MapUiSettings(zoomControlsEnabled = true)
-        ) {
-            // My Location Marker
-            state.myLocation?.let {
-                Marker(
-                    state = MarkerState(position = it),
-                    title = "You",
-                    snippet = "Your current location"
-                )
-            }
-
-            state.members
-                .filter { it.uid != state.currentUserId }
-                .forEach { member ->
-                    Marker(
-                        state = MarkerState(position = member.toLatLng()),
-                        title = member.displayName,
-                        snippet = "ID: ${member.uid.take(8)}"
-                    )
-
-                    state.myLocation?.let { my ->
-                        Polyline(
-                            points = listOf(my, member.toLatLng()),
-                            color = Color.Blue,
-                            width = 6f
-                        )
-                    }
-                }
-        }
-
-        WelcomeUserComposable(
-            displayName = state.currentUserDisplayName,
-            photoUrl = state.currentUserPhotoUrl,
-            groupId = state.groupId,
-            memberCount = state.members.size
+    ) { innerPadding ->
+        MapScreenContent(
+            state = state,
+            innerPadding = innerPadding,
+            onCreateGroup = viewModel::showCreateDialog,
+            onJoinGroup = viewModel::showJoinDialog,
+            onGroupClick = { group ->
+                navigator.navigate(GroupDetailScreenDestination(group.id, group.name))
+            },
+            onCreateGroupNameChange = viewModel::onCreateGroupNameChange,
+            onConfirmCreateGroup = viewModel::createGroup,
+            onDismissCreateDialog = viewModel::hideCreateDialog,
+            onJoinGroupIdChange = viewModel::onJoinGroupIdChange,
+            onConfirmJoinGroup = viewModel::joinGroup,
+            onDismissJoinDialog = viewModel::hideJoinDialog
         )
+    }
+}
 
-        Card(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(16.dp)
-                .fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
-            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(20.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "📍 Distance",
-                    fontSize = 14.sp,
-                    color = Color.Gray
+@Composable
+internal fun MapScreenContent(
+    state: MapScreenState,
+    innerPadding: PaddingValues = PaddingValues(0.dp),
+    onCreateGroup: () -> Unit,
+    onJoinGroup: () -> Unit,
+    onGroupClick: (Group) -> Unit,
+    onCreateGroupNameChange: (String) -> Unit,
+    onConfirmCreateGroup: () -> Unit,
+    onDismissCreateDialog: () -> Unit,
+    onJoinGroupIdChange: (String) -> Unit,
+    onConfirmJoinGroup: () -> Unit,
+    onDismissJoinDialog: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(innerPadding)
+    ) {
+        when {
+            state.isLoadingGroups -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = LocalColors.Primary)
+                }
+            }
+            state.hasGroups.not() -> {
+                NoGroupsPlaceholderComposable(
+                    onCreateGroup = onCreateGroup,
+                    onJoinGroup = onJoinGroup
                 )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = state.distance,
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF1976D2)
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = if (state.members.size > 1) "to nearest group member" else "waiting for members",
-                    fontSize = 12.sp,
-                    color = Color.Gray
+            }
+            else -> {
+                GroupsListContentComposable(
+                    groups = state.groups,
+                    onGroupClick = onGroupClick
                 )
             }
         }
+    }
+
+    if (state.showCreateDialog) {
+        CreateGroupDialogComposable(
+            groupName = state.createGroupName,
+            onGroupNameChange = onCreateGroupNameChange,
+            onConfirm = onConfirmCreateGroup,
+            onDismiss = onDismissCreateDialog,
+            isLoading = state.isCreating
+        )
+    }
+
+    if (state.showJoinDialog) {
+        JoinGroupDialogComposable(
+            groupId = state.joinGroupId,
+            onGroupIdChange = onJoinGroupIdChange,
+            onConfirm = onConfirmJoinGroup,
+            onDismiss = onDismissJoinDialog,
+            isLoading = state.isJoining
+        )
+    }
+}
+
+// ─── Previews ───────────────────────────────────────────────────────────────
+
+private val previewGroups = listOf(
+    Group(id = "1", name = "Weekend Trip", createdBy = "uid_abc", createdByName = "Samarth", memberCount = 4),
+    Group(id = "2", name = "Family", createdBy = "uid_abc", createdByName = "Samarth", memberCount = 7),
+    Group(id = "3", name = "Work Crew", createdBy = "uid_abc", createdByName = "Samarth", memberCount = 2)
+)
+
+@Preview(showBackground = true, name = "Map Screen — Loading")
+@Composable
+private fun PreviewMapScreenLoading() {
+    PinPointTheme {
+        MapScreenContent(
+            state = MapScreenState(isLoadingGroups = true),
+            onCreateGroup = {},
+            onJoinGroup = {},
+            onGroupClick = {},
+            onCreateGroupNameChange = {},
+            onConfirmCreateGroup = {},
+            onDismissCreateDialog = {},
+            onJoinGroupIdChange = {},
+            onConfirmJoinGroup = {},
+            onDismissJoinDialog = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Map Screen — No Groups")
+@Composable
+private fun PreviewMapScreenNoGroups() {
+    PinPointTheme {
+        MapScreenContent(
+            state = MapScreenState(isLoadingGroups = false, groups = emptyList()),
+            onCreateGroup = {},
+            onJoinGroup = {},
+            onGroupClick = {},
+            onCreateGroupNameChange = {},
+            onConfirmCreateGroup = {},
+            onDismissCreateDialog = {},
+            onJoinGroupIdChange = {},
+            onConfirmJoinGroup = {},
+            onDismissJoinDialog = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Map Screen — With Groups")
+@Composable
+private fun PreviewMapScreenWithGroups() {
+    PinPointTheme {
+        MapScreenContent(
+            state = MapScreenState(isLoadingGroups = false, groups = previewGroups),
+            onCreateGroup = {},
+            onJoinGroup = {},
+            onGroupClick = {},
+            onCreateGroupNameChange = {},
+            onConfirmCreateGroup = {},
+            onDismissCreateDialog = {},
+            onJoinGroupIdChange = {},
+            onConfirmJoinGroup = {},
+            onDismissJoinDialog = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Map Screen — Create Group Dialog")
+@Composable
+private fun PreviewMapScreenCreateDialog() {
+    PinPointTheme {
+        MapScreenContent(
+            state = MapScreenState(
+                isLoadingGroups = false,
+                groups = emptyList(),
+                showCreateDialog = true,
+                createGroupName = "Weekend Trip",
+                isCreating = false
+            ),
+            onCreateGroup = {},
+            onJoinGroup = {},
+            onGroupClick = {},
+            onCreateGroupNameChange = {},
+            onConfirmCreateGroup = {},
+            onDismissCreateDialog = {},
+            onJoinGroupIdChange = {},
+            onConfirmJoinGroup = {},
+            onDismissJoinDialog = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Map Screen — Join Group Dialog")
+@Composable
+private fun PreviewMapScreenJoinDialog() {
+    PinPointTheme {
+        MapScreenContent(
+            state = MapScreenState(
+                isLoadingGroups = false,
+                groups = emptyList(),
+                showJoinDialog = true,
+                joinGroupId = "-NxK2abc",
+                isJoining = false
+            ),
+            onCreateGroup = {},
+            onJoinGroup = {},
+            onGroupClick = {},
+            onCreateGroupNameChange = {},
+            onConfirmCreateGroup = {},
+            onDismissCreateDialog = {},
+            onJoinGroupIdChange = {},
+            onConfirmJoinGroup = {},
+            onDismissJoinDialog = {}
+        )
     }
 }

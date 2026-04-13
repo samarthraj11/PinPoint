@@ -24,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.example.tutorlog.design.LocalColors
 
 @Composable
 fun WelcomeUserComposable(
@@ -36,13 +37,11 @@ fun WelcomeUserComposable(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .background(Color(0xFF2E7D32), shape = RoundedCornerShape(12.dp))
-
+            .background(LocalColors.BackgroundDark.copy(alpha = 0.9f), shape = RoundedCornerShape(12.dp))
     ) {
         Spacer(modifier = Modifier.height(40.dp))
         Row(
-            modifier = Modifier
-                .padding(horizontal = 16.dp),
+            modifier = Modifier.padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             AsyncImage(
@@ -51,40 +50,37 @@ fun WelcomeUserComposable(
                 modifier = Modifier
                     .size(40.dp)
                     .clip(CircleShape)
-                    .background(Color(0xFF1976D2), CircleShape),
+                    .background(LocalColors.Primary, CircleShape),
                 contentScale = ContentScale.Crop
             )
-
             Spacer(modifier = Modifier.width(12.dp))
-
             Column {
                 Text(
                     text = "Welcome",
                     fontSize = 12.sp,
                     lineHeight = 12.sp,
-                    color = Color.White.copy(alpha = 0.8f)
+                    color = LocalColors.TextSecondary
                 )
                 Text(
                     text = displayName.ifEmpty { "User" },
                     fontSize = 16.sp,
                     lineHeight = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = LocalColors.TextPrimary
                 )
             }
         }
         Spacer(modifier = Modifier.height(12.dp))
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(color = Color(0xFF1976D2), shape = RoundedCornerShape(12.dp))
+                .background(color = LocalColors.Primary, shape = RoundedCornerShape(12.dp))
                 .padding(horizontal = 16.dp, vertical = 12.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Group ${groupId}",
+                text = "Group $groupId",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White
@@ -97,7 +93,6 @@ fun WelcomeUserComposable(
         }
     }
 }
-
 
 @Preview
 @Composable

@@ -5,7 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.material3.MaterialTheme
+import com.pinpoint.design.PinPointTheme
 import com.pinpoint.navigation.AppNavigation
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -18,7 +18,7 @@ class MainActivity : ComponentActivity() {
         )
         super.onCreate(savedInstanceState)
         setContent {
-            MaterialTheme {
+            PinPointTheme {
                 AppNavigation()
             }
         }

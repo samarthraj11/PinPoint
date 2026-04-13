@@ -15,29 +15,17 @@ import javax.inject.Singleton
 @Singleton
 class FirebaseLocationRepository @Inject constructor() {
 
-    companion object {
-        const val DEFAULT_GROUP_ID = "2748"
-    }
-
     private val database = FirebaseDatabase.getInstance()
 
-    private fun groupMembersRef(groupId: String = DEFAULT_GROUP_ID) =
+    private fun groupMembersRef(groupId: String) =
         database.getReference("groups/$groupId/members")
-
-    fun joinGroup(uid: String, displayName: String, groupId: String = DEFAULT_GROUP_ID) {
-        val data = mapOf<String, Any>(
-            "displayName" to displayName,
-            "joinedAt" to ServerValue.TIMESTAMP
-        )
-        groupMembersRef(groupId).child(uid).updateChildren(data)
-    }
 
     fun updateMyLocation(
         uid: String,
         displayName: String,
         lat: Double,
         lng: Double,
-        groupId: String = DEFAULT_GROUP_ID
+        groupId: String
     ) {
         val data = mapOf<String, Any>(
             "displayName" to displayName,
@@ -48,7 +36,7 @@ class FirebaseLocationRepository @Inject constructor() {
         groupMembersRef(groupId).child(uid).updateChildren(data)
     }
 
-    fun observeMembers(groupId: String = DEFAULT_GROUP_ID): Flow<List<MemberLocation>> =
+    fun observeMembers(groupId: String): Flow<List<MemberLocation>> =
         callbackFlow {
             val ref = groupMembersRef(groupId)
             val listener = ref.addValueEventListener(object : ValueEventListener {
@@ -79,7 +67,7 @@ class FirebaseLocationRepository @Inject constructor() {
             awaitClose { ref.removeEventListener(listener) }
         }
 
-    fun removeMyLocation(uid: String, groupId: String = DEFAULT_GROUP_ID) {
+    fun removeMyLocation(uid: String, groupId: String) {
         groupMembersRef(groupId).child(uid).removeValue()
     }
 }
