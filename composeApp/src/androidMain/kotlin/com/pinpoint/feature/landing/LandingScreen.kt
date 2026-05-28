@@ -47,11 +47,11 @@ fun LandingScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = LocalColors.Gray900),
+            .background(color = LocalColors.BackgroundDark),
         contentAlignment = Alignment.Center
     ) {
         CircularProgressIndicator(
-            color = LocalColors.PrimaryGreen
+            color = LocalColors.Primary
         )
     }
 }

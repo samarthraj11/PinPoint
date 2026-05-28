@@ -1,81 +1,84 @@
-//package com.example.tutorlog.design
-//
-//
-//import androidx.compose.foundation.layout.Column
-//import androidx.compose.material.icons.Icons
-//import androidx.compose.material.icons.filled.DateRange
-//import androidx.compose.material.icons.filled.Home
-//import androidx.compose.material.icons.filled.MoreVert
-//import androidx.compose.material.icons.filled.Person
-//import androidx.compose.material3.HorizontalDivider
-//import androidx.compose.material3.Icon
-//import androidx.compose.material3.NavigationBar
-//import androidx.compose.material3.NavigationBarItem
-//import androidx.compose.material3.NavigationBarItemDefaults
-//import androidx.compose.material3.Text
-//import androidx.compose.runtime.Composable
-//import androidx.compose.ui.graphics.vector.ImageVector
-//import androidx.compose.ui.tooling.preview.Preview
-//import com.example.tutorlog.domain.types.BottomBarTabTypes
-//
-//data class BottomNavItem(
-//    val title: String,
-//    val icon: ImageVector,
-//    val route: String
-//)
-//
-//@Composable
-//fun BottomNavigationBar(
-//    selectedTab: Int,
-//    onTabSelected: (BottomBarTabTypes) -> Unit
-//) {
-//    val items = listOf(
-//        BottomNavItem("Home", Icons.Default.Home, "home"),
-//        BottomNavItem("Students", Icons.Default.Person, "students"),
-////        BottomNavItem("Events", Icons.Default.DateRange, "profile"),
-////        BottomNavItem("MORE", Icons.Default.MoreVert, "more")
-//    )
-//    Column {
-//        HorizontalDivider(color = LocalColors.Neutral600)
-//        NavigationBar(
-//            containerColor = LocalColors.BackgroundDefaultDark
-//        ) {
-//            items.forEachIndexed { index, item ->
-//                NavigationBarItem(
-//                    icon = {
-//                        Icon(
-//                            imageVector = item.icon,
-//                            contentDescription = item.title
-//                        )
-//                    },
-//                    label = {
-//                        Text(text = item.title)
-//                    },
-//                    selected = selectedTab == index,
-//                    onClick = {
-//                        when (index) {
-//                            0 -> onTabSelected(BottomBarTabTypes.HOME)
-//                            1 -> onTabSelected(BottomBarTabTypes.STUDENTS)
-//                            2 -> onTabSelected(BottomBarTabTypes.EVENTS)
-//                            3 -> onTabSelected(BottomBarTabTypes.MORE)
-//                        }
-//                    },
-//                    colors = NavigationBarItemDefaults.colors(
-//                        selectedIconColor = LocalColors.White,
-//                        selectedTextColor = LocalColors.White,
-//                        unselectedIconColor = LocalColors.White.copy(alpha = 0.6f),
-//                        unselectedTextColor = LocalColors.White.copy(alpha = 0.6f),
-//                        indicatorColor = LocalColors.White.copy(alpha = 0.2f)
-//                    )
-//                )
-//            }
-//        }
-//    }
-//
-//}
-//
-//@Preview
-//@Composable
-//private fun PreviewBottomNavigationBar() {
-//    BottomNavigationBar(selectedTab = 0, onTabSelected = {})
-//}
+package com.pinpoint.design
+
+import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.tutorlog.design.LocalColors
+import com.pinpoint.R
+import com.ramcosta.composedestinations.generated.destinations.GroupsScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.MapScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.ProfileScreenDestination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.spec.DirectionDestinationSpec
+
+enum class BottomTab(
+    val direction: DirectionDestinationSpec,
+    val icon: Int,
+    val label: String
+) {
+    Explore(MapScreenDestination, R.drawable.ballooon, "Explore"),
+    Groups(GroupsScreenDestination, R.drawable.ballooon, "Groups"),
+    Profile(ProfileScreenDestination, R.drawable.ballooon, "Profile")
+}
+
+@Composable
+fun PinPointBottomBar(
+    currentTab: BottomTab,
+    navigator: DestinationsNavigator
+) {
+    Column {
+        HorizontalDivider(color = LocalColors.BorderLight, thickness = 0.5.dp)
+        NavigationBar(
+            containerColor = LocalColors.BackgroundDark,
+            tonalElevation = 0.dp
+        ) {
+            BottomTab.entries.forEach { tab ->
+                val selected = tab == currentTab
+                NavigationBarItem(
+                    selected = selected,
+                    onClick = {
+                        if (selected) return@NavigationBarItem
+                        navigator.navigate(tab.direction) {
+                            // Always pop back to Map so the backstack is Map -> current
+                            popUpTo(MapScreenDestination) {
+                                saveState = true
+                                inclusive = false
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                    icon = {
+                        Icon(
+                            painter = painterResource(tab.icon),
+                            contentDescription = tab.label
+                        )
+                    },
+                    label = {
+                        Text(
+                            tab.label,
+                            fontSize = 10.sp,
+                            fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
+                        )
+                    },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = LocalColors.Primary,
+                        selectedTextColor = LocalColors.Primary,
+                        unselectedIconColor = LocalColors.TextSecondary,
+                        unselectedTextColor = LocalColors.TextSecondary,
+                        indicatorColor = LocalColors.PrimaryDim
+                    )
+                )
+            }
+        }
+    }
+}

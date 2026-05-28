@@ -1,22 +1,45 @@
 package com.pinpoint.feature.profile
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.SubcomposeAsyncImage
+import coil.compose.AsyncImage
+import com.example.tutorlog.design.LocalColors
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
+import com.pinpoint.design.BottomTab
+import com.pinpoint.design.PinPointBottomBar
+import com.pinpoint.feature.profile.composable.AchievementBadgeComposable
+import com.pinpoint.feature.profile.composable.SectionHeaderComposable
+import com.pinpoint.feature.profile.composable.SettingsRowComposable
+import com.pinpoint.feature.profile.composable.StatCardComposable
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.NavGraphs
 import com.ramcosta.composedestinations.generated.destinations.LoginScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.MapScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.orbitmvi.orbit.compose.collectSideEffect
 
@@ -26,111 +49,327 @@ fun ProfileScreen(
     navigator: DestinationsNavigator,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
+    BackHandler {
+        navigator.navigate(MapScreenDestination) {
+            popUpTo(MapScreenDestination) { inclusive = false }
+            launchSingleTop = true
+        }
+    }
 
     viewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
             is ProfileScreenSideEffect.NavigateToLogin -> {
                 navigator.navigate(LoginScreenDestination) {
-                    popUpTo(NavGraphs.root) {
-                        inclusive = true
-                    }
+                    popUpTo(NavGraphs.root) { inclusive = true }
                     launchSingleTop = true
                 }
             }
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Spacer(modifier = Modifier.height(32.dp))
+    val user = Firebase.auth.currentUser
+    val displayName = user?.displayName ?: "User"
+    val photoUrl = user?.photoUrl?.toString()
+    val email = user?.email ?: ""
 
-        // Avatar placeholder
-        Box(
-            modifier = Modifier
-                .size(100.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primaryContainer),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = "SR",
-                fontSize = 36.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
-            )
+    Scaffold(
+        containerColor = LocalColors.BackgroundDark,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        bottomBar = {
+            PinPointBottomBar(currentTab = BottomTab.Profile, navigator = navigator)
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "Samarth Raj",
-            fontSize = 22.sp,
-            fontWeight = FontWeight.Bold
-        )
-
-        Text(
-            text = "samarth@example.com",
-            fontSize = 14.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // Profile info cards
-        ProfileInfoCard(label = "Phone", value = "+91 98765 43210")
-        Spacer(modifier = Modifier.height(12.dp))
-        ProfileInfoCard(label = "Location", value = "New Delhi, India")
-        Spacer(modifier = Modifier.height(12.dp))
-        ProfileInfoCard(label = "Status", value = "Available")
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        // Logout button
-        Button(
-            onClick = { viewModel.logout() },
+    ) { innerPadding ->
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.error
-            )
+                .fillMaxSize()
+                .padding(innerPadding)
+                .verticalScroll(rememberScrollState())
+                .background(LocalColors.BackgroundDark)
         ) {
+            // Header
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = { navigator.popBackStack() }) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back",
+                        tint = LocalColors.Primary
+                    )
+                }
+                Text(
+                    text = "Profile",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = LocalColors.TextPrimary
+                )
+                IconButton(onClick = { }) {
+                    Icon(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = "Settings",
+                        tint = LocalColors.Primary
+                    )
+                }
+            }
+
+            // Hero Profile Section
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp, vertical = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // Avatar with edit button
+                Box {
+                    Box(
+                        modifier = Modifier
+                            .size(128.dp)
+                            .border(4.dp, LocalColors.Primary, CircleShape)
+                            .padding(4.dp)
+                            .clip(CircleShape)
+                            .background(LocalColors.PrimaryLight)
+                    ) {
+                        SubcomposeAsyncImage(
+                            model = photoUrl,
+                            contentDescription = "Profile Avatar of $displayName",
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(CircleShape),
+                            contentScale = ContentScale.Crop,
+                            loading = { InitialsPlaceholder(displayName) },
+                            error = { InitialsPlaceholder(displayName) }
+                        )
+                    }
+                    // Edit button
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .size(36.dp)
+                            .border(4.dp, LocalColors.BackgroundDark, CircleShape)
+                            .background(LocalColors.Primary, CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = "Edit",
+                            tint = LocalColors.BackgroundDark,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = displayName,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = LocalColors.TextPrimary
+                )
+
+                if (email.isNotEmpty()) {
+                    Text(
+                        text = email,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = LocalColors.Primary
+                    )
+                }
+
+                Text(
+                    text = "Location Sharing Enthusiast",
+                    fontSize = 13.sp,
+                    color = LocalColors.TextSecondary,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
+
+            // Stats Grid
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                StatCardComposable(modifier = Modifier.weight(1f), value = "1,240", label = "KM")
+                StatCardComposable(modifier = Modifier.weight(1f), value = "48", label = "TRIPS")
+                StatCardComposable(modifier = Modifier.weight(1f), value = "15", label = "BADGES")
+            }
+
+            Spacer(modifier = Modifier.height(28.dp))
+
+            // My Bike Section
+            SectionHeaderComposable(title = "My Bike", actionText = "Manage")
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = LocalColors.SurfaceDark),
+                border = CardDefaults.outlinedCardBorder().copy(
+                    brush = androidx.compose.ui.graphics.SolidColor(LocalColors.BorderLight)
+                )
+            ) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(80.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(LocalColors.BackgroundDark),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "\uD83D\uDEB2",
+                            fontSize = 36.sp
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(14.dp))
+
+                    Column {
+                        Text(
+                            text = "Canyon Spectral CF 8",
+                            fontSize = 17.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = LocalColors.TextPrimary
+                        )
+                        Text(
+                            text = "Mountain \u2022 Carbon Fiber",
+                            fontSize = 13.sp,
+                            color = LocalColors.TextSecondary,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                        Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+                            Text(
+                                text = "\u2699\uFE0F Tuned 2d ago",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = LocalColors.Primary
+                            )
+                            Text(
+                                text = "\uD83D\uDCCF 245km left",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = LocalColors.TextSecondary
+                            )
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(28.dp))
+
+            // Achievements Section
             Text(
-                text = "Logout",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium,
-                modifier = Modifier.padding(vertical = 4.dp)
+                text = "Achievements",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = LocalColors.TextPrimary,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
             )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState())
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                AchievementBadgeComposable(emoji = "\u26A1", label = "Speed Demon", unlocked = true)
+                AchievementBadgeComposable(emoji = "\u26F0\uFE0F", label = "Peak Climber", unlocked = true)
+                AchievementBadgeComposable(emoji = "\uD83D\uDCC5", label = "Daily Rider", unlocked = true)
+                AchievementBadgeComposable(emoji = "\uD83C\uDFC6", label = "Century Club", unlocked = false)
+                AchievementBadgeComposable(emoji = "\uD83D\uDDFA\uFE0F", label = "Pathfinder", unlocked = true)
+            }
+
+            Spacer(modifier = Modifier.height(28.dp))
+
+            // App Settings Section
+            Text(
+                text = "App Settings",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = LocalColors.TextPrimary,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Column(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                SettingsRowComposable(
+                    emoji = "\uD83D\uDD14",
+                    label = "Notifications",
+                    showToggle = true,
+                    onClick = {}
+                )
+                SettingsRowComposable(
+                    emoji = "\uD83D\uDD12",
+                    label = "Privacy & Security",
+                    onClick = {}
+                )
+                SettingsRowComposable(
+                    emoji = "\u2601\uFE0F",
+                    label = "Data Synchronization",
+                    onClick = {}
+                )
+                // Sign Out
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { viewModel.logout() },
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = LocalColors.SurfaceDark)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(text = "\uD83D\uDEAA", fontSize = 20.sp)
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Text(
+                            text = "Sign Out",
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = LocalColors.Red400
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
         }
     }
 }
 
+
 @Composable
-private fun ProfileInfoCard(label: String, value: String) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
+private fun InitialsPlaceholder(displayName: String) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(LocalColors.PrimaryLight, CircleShape),
+        contentAlignment = Alignment.Center
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = label,
-                fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = value,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium
-            )
-        }
+        Text(
+            text = displayName.take(2).uppercase(),
+            fontSize = 40.sp,
+            fontWeight = FontWeight.Bold,
+            color = LocalColors.Primary
+        )
     }
 }

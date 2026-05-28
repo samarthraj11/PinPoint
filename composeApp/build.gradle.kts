@@ -44,6 +44,8 @@ kotlin {
             implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
             // Coil for image loading
             implementation("io.coil-kt:coil-compose:2.6.0")
+            // Material Icons Extended
+            implementation("androidx.compose.material:material-icons-extended:1.6.8")
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)

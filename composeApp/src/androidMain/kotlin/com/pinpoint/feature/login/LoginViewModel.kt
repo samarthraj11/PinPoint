@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pinpoint.domain.model.UIGoogleUserInfo
 import com.pinpoint.domain.preferences.UserPreferences
-import com.pinpoint.domain.repository.FirebaseLocationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -16,7 +15,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val locationRepository: FirebaseLocationRepository,
     private val userPreferences: UserPreferences
 ): ContainerHost<LoginScreenState, LoginScreenSideEffect>, ViewModel() {
 
@@ -26,9 +24,7 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             intent {
                 reduce {
-                    state.copy(
-                        isLoading = true
-                    )
+                    state.copy(isLoading = true)
                 }
                 postSideEffect(LoginScreenSideEffect.SignInWithGoogle)
             }
@@ -45,25 +41,16 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             intent {
                 reduce {
-                    state.copy(
-                        isLoading = false
-                    )
+                    state.copy(isLoading = false)
                 }
             }
         }
     }
 
-
-    fun createUser(
-        userInfo: UIGoogleUserInfo
-    ) {
+    fun createUser(userInfo: UIGoogleUserInfo) {
         viewModelScope.launch {
             intent {
                 saveLocalUser(userInfo)
-                locationRepository.joinGroup(
-                    uid = userInfo.uid,
-                    displayName = userInfo.displayName
-                )
                 delay(500)
                 postSideEffect(LoginScreenSideEffect.NavigateToHomeScreen)
             }
