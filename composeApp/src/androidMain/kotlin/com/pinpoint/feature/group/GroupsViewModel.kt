@@ -114,4 +114,29 @@ class GroupsViewModel @Inject constructor(
     fun onGroupClick(groupId: String, groupName: String) = intent {
         postSideEffect(GroupsScreenSideEffect.NavigateToGroupDetail(groupId, groupName))
     }
+
+    fun onDeleteGroupClick(group: com.pinpoint.domain.model.Group) = intent {
+        reduce { state.copy(groupPendingDelete = group) }
+    }
+
+    fun cancelDeleteGroup() = intent {
+        reduce { state.copy(groupPendingDelete = null) }
+    }
+
+    fun confirmDeleteGroup() = intent {
+        val group = state.groupPendingDelete ?: return@intent
+        reduce { state.copy(isDeleting = true) }
+        try {
+            if (group.createdBy == state.currentUserId) {
+                groupRepository.deleteGroup(group.id)
+            } else {
+                groupRepository.leaveGroup(group.id, state.currentUserId)
+            }
+            reduce { state.copy(isDeleting = false, groupPendingDelete = null) }
+            postSideEffect(GroupsScreenSideEffect.ShowSuccess("Group removed"))
+        } catch (e: Exception) {
+            reduce { state.copy(isDeleting = false, groupPendingDelete = null) }
+            postSideEffect(GroupsScreenSideEffect.ShowError("Failed to remove group: ${e.message}"))
+        }
+    }
 }

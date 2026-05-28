@@ -1,5 +1,6 @@
 package com.pinpoint.domain.repository
 
+import android.util.Log
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -91,6 +92,7 @@ class FirebaseGroupRepository @Inject constructor() {
             }
 
             override fun onCancelled(error: DatabaseError) {
+                Log.e("FirebaseGroupRepo", "observeUserGroups cancelled: ${error.code} ${error.message}", error.toException())
                 close(error.toException())
             }
         })
@@ -99,5 +101,9 @@ class FirebaseGroupRepository @Inject constructor() {
 
     suspend fun leaveGroup(groupId: String, uid: String) {
         groupsRef.child(groupId).child("members").child(uid).removeValue().await()
+    }
+
+    suspend fun deleteGroup(groupId: String) {
+        groupsRef.child(groupId).removeValue().await()
     }
 }

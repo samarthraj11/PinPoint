@@ -183,7 +183,8 @@ fun GroupsScreen(
                         items(state.groups, key = { it.id }) { group ->
                             GroupCardComposable(
                                 group = group,
-                                onClick = { viewModel.onGroupClick(group.id, group.name) }
+                                onClick = { viewModel.onGroupClick(group.id, group.name) },
+                                onDelete = { viewModel.onDeleteGroupClick(group) }
                             )
                         }
                     }
@@ -200,6 +201,37 @@ fun GroupsScreen(
             onConfirm = viewModel::createGroup,
             onDismiss = viewModel::hideCreateDialog,
             isLoading = state.isCreating
+        )
+    }
+
+    // Delete Group Confirmation Dialog
+    state.groupPendingDelete?.let { group ->
+        val isOwner = group.createdBy == state.currentUserId
+        AlertDialog(
+            onDismissRequest = { viewModel.cancelDeleteGroup() },
+            containerColor = LocalColors.SurfaceDark,
+            titleContentColor = LocalColors.TextPrimary,
+            textContentColor = LocalColors.TextSecondary,
+            title = { Text(if (isOwner) "Delete group?" else "Leave group?", fontWeight = FontWeight.Bold) },
+            text = {
+                Text(
+                    if (isOwner) "This will permanently delete \"${group.name}\" for everyone."
+                    else "You will leave \"${group.name}\" and stop sharing your location with its members."
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = { viewModel.confirmDeleteGroup() },
+                    enabled = !state.isDeleting
+                ) {
+                    Text(if (isOwner) "Delete" else "Leave", color = LocalColors.Primary)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { viewModel.cancelDeleteGroup() }) {
+                    Text("Cancel", color = LocalColors.TextSecondary)
+                }
+            }
         )
     }
 

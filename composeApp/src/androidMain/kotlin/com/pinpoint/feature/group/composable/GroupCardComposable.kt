@@ -16,9 +16,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -32,7 +34,7 @@ import com.example.tutorlog.design.LocalColors
 import com.pinpoint.domain.model.Group
 
 @Composable
-fun GroupCardComposable(group: Group, onClick: () -> Unit) {
+fun GroupCardComposable(group: Group, onClick: () -> Unit, onDelete: () -> Unit = {}) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -129,6 +131,15 @@ fun GroupCardComposable(group: Group, onClick: () -> Unit) {
                         )
                     }
                 }
+            }
+
+            IconButton(onClick = onDelete, modifier = Modifier.size(32.dp)) {
+                Icon(
+                    imageVector = Icons.Outlined.Delete,
+                    contentDescription = "Delete group",
+                    tint = LocalColors.TextSecondary,
+                    modifier = Modifier.size(20.dp)
+                )
             }
 
             Icon(

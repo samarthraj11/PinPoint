@@ -13,5 +13,7 @@ data class GroupsScreenState(
     val isJoining: Boolean = false,
     val currentUserId: String = "",
     val currentUserName: String = "",
-    val currentUserPhoto: String? = null
+    val currentUserPhoto: String? = null,
+    val groupPendingDelete: Group? = null,
+    val isDeleting: Boolean = false
 )
